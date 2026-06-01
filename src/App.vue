@@ -1,5 +1,5 @@
 <script setup lang="ts">
-console.log('v.0.0.1')
+console.log('v.0.0.2')
 </script>
 
 <template>
