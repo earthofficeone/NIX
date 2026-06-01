@@ -1,0 +1,166 @@
+$gold: var(--Primary-Color);
+$bg: var(--Background-Color);
+$card-bg: rgba(255, 255, 255, 0.04);
+$card-border: rgba(201, 169, 110, 0.22);
+$text: #f5f0e8;
+$muted: rgba(245, 240, 232, 0.55);
+$danger: #c45c5c;
+$success: #6b9d7a;
+
+.lux-card {
+  background: $card-bg;
+  border: 1px solid $card-border;
+  border-radius: 1.25rem;
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.lux-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  border: none;
+
+  &--gold {
+    background: linear-gradient(135deg, #d4b87a 0%, #a8894a 100%);
+    color: #1a1510;
+    font-weight: 600;
+    box-shadow: 0 4px 20px rgba(201, 169, 110, 0.35);
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(201, 169, 110, 0.45);
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: $gold;
+    border: 1px solid $card-border;
+
+    &:hover {
+      background: rgba(201, 169, 110, 0.08);
+    }
+  }
+
+  &--full {
+    width: 100%;
+  }
+}
+
+.lux-input {
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(201, 169, 110, 0.18);
+  border-radius: 0.75rem;
+  color: $text;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &::placeholder {
+    color: $muted;
+  }
+
+  &:focus {
+    border-color: rgba(201, 169, 110, 0.55);
+  }
+}
+
+.lux-label {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $muted;
+  margin-bottom: 0.4rem;
+}
+
+.lux-title {
+  font-size: 1.75rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: $text;
+}
+
+.lux-subtitle {
+  font-size: 0.85rem;
+  color: $muted;
+  letter-spacing: 0.08em;
+}
+
+.lux-amount-display {
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  color: $text;
+  text-align: right;
+  min-height: 3rem;
+  word-break: break-all;
+
+  &--income {
+    color: $success;
+  }
+
+  &--expense {
+    color: $danger;
+  }
+}
+
+.lux-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, $card-border, transparent);
+  margin: 1.25rem 0;
+}
+
+.lux-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+
+  &--income {
+    background: rgba(107, 157, 122, 0.2);
+    color: $success;
+  }
+
+  &--expense {
+    background: rgba(196, 92, 92, 0.2);
+    color: $danger;
+  }
+}
+
+.lux-fab {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 5.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d4b87a, #a8894a);
+  color: #1a1510;
+  border: none;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(201, 169, 110, 0.4);
+  z-index: 40;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
