@@ -1,37 +1,30 @@
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { api, ApiError } from '@/api/client'
 import type { MonthSummary, Transaction, TransactionType } from '@/types'
-import { loadJson, saveJson } from '@/utils/storage'
 import { monthKey, todayISO } from '@/utils/format'
-import { useAuthStore } from './auth'
-
-const TX_KEY = 'nix_transactions'
 
 export const useTransactionStore = defineStore('transactions', () => {
-  const all = ref<Transaction[]>(loadJson<Transaction[]>(TX_KEY, []))
-  const auth = useAuthStore()
-
-  watch(
-    all,
-    (val) => saveJson(TX_KEY, val),
-    { deep: true },
-  )
+  const items = ref<Transaction[]>([])
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+  const loadedMonth = ref<string | null>(null)
 
   const userTransactions = computed(() =>
-    all.value
-      .filter((t) => t.userId === auth.currentUser?.id)
-      .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)),
+    [...items.value].sort(
+      (a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt),
+    ),
   )
 
   function summaryForMonth(key: string): MonthSummary {
-    const items = userTransactions.value.filter((t) => t.date.startsWith(key))
-    const income = items.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0)
-    const expense = items.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+    const list = userTransactions.value.filter((t) => t.date.startsWith(key))
+    const income = list.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+    const expense = list.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
     return {
       income,
       expense,
       balance: income - expense,
-      count: items.length,
+      count: list.length,
     }
   }
 
@@ -65,74 +58,120 @@ export const useTransactionStore = defineStore('transactions', () => {
     return userTransactions.value.find((t) => t.id === id)
   }
 
-  function create(payload: {
+  async function fetchList(month?: string) {
+    loading.value = true
+    error.value = null
+    try {
+      items.value = await api.listTransactions(month)
+      loadedMonth.value = month ?? null
+    } catch (e) {
+      error.value = e instanceof ApiError ? e.message : 'โหลดรายการไม่สำเร็จ'
+      items.value = []
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchById(id: string): Promise<Transaction | null> {
+    const cached = getById(id)
+    if (cached) return cached
+    try {
+      const tx = await api.getTransaction(id)
+      const idx = items.value.findIndex((t) => t.id === id)
+      if (idx === -1) items.value.push(tx)
+      else items.value[idx] = tx
+      return tx
+    } catch {
+      return null
+    }
+  }
+
+  async function create(payload: {
     type: TransactionType
     amount: number
     title: string
     note: string
     image?: string
     date?: string
-  }) {
-    const userId = auth.currentUser?.id
-    if (!userId) return null
-    const now = new Date().toISOString()
-    const tx: Transaction = {
-      id: crypto.randomUUID(),
-      userId,
-      type: payload.type,
-      amount: payload.amount,
-      title: payload.title.trim() || (payload.type === 'income' ? 'รายรับ' : 'รายจ่าย'),
-      note: payload.note.trim(),
-      image: payload.image,
-      date: payload.date ?? todayISO(),
-      createdAt: now,
-      updatedAt: now,
+  }): Promise<Transaction | null> {
+    try {
+      const tx = await api.createTransaction({
+        type: payload.type,
+        amount: payload.amount,
+        title: payload.title,
+        note: payload.note,
+        image: payload.image,
+        date: payload.date ?? todayISO(),
+      })
+      items.value.unshift(tx)
+      return tx
+    } catch (e) {
+      error.value = e instanceof ApiError ? e.message : 'บันทึกไม่สำเร็จ'
+      return null
     }
-    all.value.push(tx)
-    return tx
   }
 
-  function update(
+  async function update(
     id: string,
     payload: Partial<Pick<Transaction, 'type' | 'amount' | 'title' | 'note' | 'image' | 'date'>>,
-  ) {
-    const idx = all.value.findIndex((t) => t.id === id)
-    if (idx === -1) return false
-    const existing = all.value[idx]
-    if (!existing || existing.userId !== auth.currentUser?.id) return false
-    all.value[idx] = {
-      ...existing,
-      ...payload,
-      title: payload.title !== undefined ? payload.title.trim() : existing.title,
-      note: payload.note !== undefined ? payload.note.trim() : existing.note,
-      updatedAt: new Date().toISOString(),
+  ): Promise<boolean> {
+    const existing = getById(id)
+    if (!existing) return false
+    try {
+      const tx = await api.updateTransaction(id, {
+        type: payload.type ?? existing.type,
+        amount: payload.amount ?? existing.amount,
+        title: payload.title ?? existing.title,
+        note: payload.note ?? existing.note,
+        image: payload.image !== undefined ? payload.image : existing.image,
+        date: payload.date ?? existing.date,
+      })
+      const idx = items.value.findIndex((t) => t.id === id)
+      if (idx !== -1) items.value[idx] = tx
+      return true
+    } catch (e) {
+      error.value = e instanceof ApiError ? e.message : 'แก้ไขไม่สำเร็จ'
+      return false
     }
-    return true
   }
 
-  function remove(id: string) {
-    const idx = all.value.findIndex((t) => t.id === id)
-    if (idx === -1) return false
-    const existing = all.value[idx]
-    if (!existing || existing.userId !== auth.currentUser?.id) return false
-    all.value.splice(idx, 1)
-    return true
+  async function remove(id: string): Promise<boolean> {
+    try {
+      await api.deleteTransaction(id)
+      items.value = items.value.filter((t) => t.id !== id)
+      return true
+    } catch (e) {
+      error.value = e instanceof ApiError ? e.message : 'ลบไม่สำเร็จ'
+      return false
+    }
   }
 
   function recent(limit = 5) {
     return userTransactions.value.slice(0, limit)
   }
 
+  function clear() {
+    items.value = []
+    loadedMonth.value = null
+  }
+
   return {
+    items,
+    loading,
+    error,
+    loadedMonth,
     userTransactions,
     summaryForMonth,
     dailyGroups,
     categoryBreakdown,
     getById,
+    fetchList,
+    fetchById,
     create,
     update,
     remove,
     recent,
+    clear,
     monthKey,
   }
 })

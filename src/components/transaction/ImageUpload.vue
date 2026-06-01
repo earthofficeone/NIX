@@ -1,52 +1,172 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import ImageLightbox from '@/components/transaction/ImageLightbox.vue'
+import { parseSlipFromDataUrl, type SlipQrParseResult } from '@/composables/useSlipQr'
 
 const model = defineModel<string | undefined>()
 
-const preview = ref(model.value)
+const emit = defineEmits<{
+  parsed: [result: SlipQrParseResult]
+}>()
+
 const fileInput = ref<HTMLInputElement | null>(null)
+const lightboxOpen = ref(false)
+const parsing = ref(false)
+const parseMessage = ref<string | null>(null)
+
+const hasImage = computed(() => !!model.value)
+
+const parseMessageClass = computed(() => {
+  if (!parseMessage.value) return ''
+  if (parseMessage.value.includes('สำเร็จ')) return 'upload__status--ok'
+  if (parseMessage.value.includes('ไม่พบ')) return 'upload__status--muted'
+  return 'upload__status--warn'
+})
+
+watch(
+  () => model.value,
+  (value) => {
+    if (fileInput.value && !value) fileInput.value.value = ''
+    if (!value) parseMessage.value = null
+  },
+)
+
+function statusMessage(result: SlipQrParseResult): string {
+  if (result.status === 'success') {
+    if (result.amount != null && result.amount > 0) {
+      return 'อ่าน QR สำเร็จ — กรุณาตรวจข้อมูลก่อนบันทึก'
+    }
+    if (result.kind === 'slip_verify') {
+      return 'อ่าน QR สลิปสำเร็จ — เติมเลขอ้างอิงแล้ว กรุณากรอกจำนวนเงินจากสลิป'
+    }
+    return 'อ่าน QR สำเร็จ — กรุณากรอกจำนวนเงินและตรวจข้อมูลก่อนบันทึก'
+  }
+  if (result.status === 'no_qr') {
+    return 'ไม่พบ QR บนรูป — กรอกข้อมูลเองได้'
+  }
+  return 'พบ QR แต่อ่านไม่ได้ — กรอกข้อมูลเองได้'
+}
+
+async function readQrFromDataUrl(dataUrl: string) {
+  parsing.value = true
+  parseMessage.value = 'กำลังอ่าน QR...'
+  try {
+    const result = await parseSlipFromDataUrl(dataUrl)
+    emit('parsed', result)
+    parseMessage.value = statusMessage(result)
+  } catch {
+    parseMessage.value = 'อ่าน QR ไม่สำเร็จ — กรอกข้อมูลเองได้'
+  } finally {
+    parsing.value = false
+  }
+}
+
+function pickImage() {
+  fileInput.value?.click()
+}
 
 function onFileChange(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
-  if (!file.type.startsWith('image/')) return
+  if (!file.type.startsWith('image/')) {
+    alert('กรุณาเลือกไฟล์รูปภาพ')
+    return
+  }
   if (file.size > 3 * 1024 * 1024) {
     alert('รูปภาพต้องไม่เกิน 3 MB')
     return
   }
   const reader = new FileReader()
   reader.onload = () => {
-    const result = reader.result as string
-    preview.value = result
-    model.value = result
+    const dataUrl = reader.result as string
+    model.value = dataUrl
+    void readQrFromDataUrl(dataUrl)
   }
   reader.readAsDataURL(file)
+  if (fileInput.value) fileInput.value.value = ''
 }
 
 function remove() {
-  preview.value = undefined
   model.value = undefined
+  parseMessage.value = null
   if (fileInput.value) fileInput.value.value = ''
+}
+
+function openLightbox() {
+  if (model.value) lightboxOpen.value = true
 }
 </script>
 
 <template>
   <div class="upload">
-    <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFileChange" />
-    <div v-if="preview" class="upload__preview">
-      <img :src="preview" alt="แนบรูป" />
-      <button type="button" class="upload__remove" aria-label="ลบรูป" @click="remove">×</button>
+    <input
+      ref="fileInput"
+      type="file"
+      accept="image/*"
+      class="hidden"
+      @change="onFileChange"
+    />
+
+    <p class="upload__hint">แนบได้ 1 รูปต่อรายการ (สลิป / ใบเสร็จ) — อ่าน QR อัตโนมัติ ไม่มีค่าใช้จ่าย</p>
+
+    <p
+      v-if="parseMessage"
+      class="upload__status"
+      :class="parseMessageClass"
+      role="status"
+    >
+      {{ parsing ? 'กำลังอ่าน QR...' : parseMessage }}
+    </p>
+
+    <div v-if="hasImage" class="upload__preview-wrap">
+      <button type="button" class="upload__preview" aria-label="ขยายรูป" @click="openLightbox">
+        <img :src="model" alt="รูปแนบ" />
+        <span class="upload__zoom">แตะเพื่อขยาย</span>
+      </button>
+      <div class="upload__actions">
+        <button type="button" class="upload__btn" @click="pickImage">เปลี่ยนรูป</button>
+        <button type="button" class="upload__btn upload__btn--danger" @click="remove">ลบรูป</button>
+      </div>
     </div>
-    <button v-else type="button" class="upload__trigger" @click="fileInput?.click()">
+
+    <button v-else type="button" class="upload__trigger" @click="pickImage">
       <span class="upload__icon">📎</span>
       <span>แนบรูปสลิป / ใบเสร็จ</span>
     </button>
+
+    <ImageLightbox v-if="model" v-model="lightboxOpen" :src="model" alt="รูปแนบ" />
   </div>
 </template>
 
 <style scoped lang="scss">
 .hidden {
   display: none;
+}
+
+.upload__hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  color: rgba(245, 240, 232, 0.4);
+}
+
+.upload__status {
+  margin: 0 0 0.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+
+  &--ok {
+    color: var(--Primary-Color);
+  }
+
+  &--muted {
+    color: rgba(245, 240, 232, 0.45);
+  }
+
+  &--warn {
+    color: #d4a574;
+  }
 }
 
 .upload__trigger {
@@ -74,32 +194,71 @@ function remove() {
   font-size: 1.1rem;
 }
 
+.upload__preview-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
 .upload__preview {
   position: relative;
+  padding: 0;
+  border: 1px solid rgba(201, 169, 110, 0.25);
   border-radius: 0.75rem;
   overflow: hidden;
-  border: 1px solid rgba(201, 169, 110, 0.2);
+  background: rgba(0, 0, 0, 0.35);
+  cursor: zoom-in;
 
   img {
     width: 100%;
-    max-height: 200px;
+    max-height: 220px;
     object-fit: cover;
     display: block;
   }
+
+  &:hover .upload__zoom {
+    opacity: 1;
+  }
 }
 
-.upload__remove {
+.upload__zoom {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  border: none;
-  background: rgba(0, 0, 0, 0.7);
-  color: #fff;
-  font-size: 1.25rem;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #f5f0e8;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.upload__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.upload__btn {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(201, 169, 110, 0.25);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: rgba(245, 240, 232, 0.75);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
   cursor: pointer;
-  line-height: 1;
+
+  &:hover {
+    border-color: var(--Primary-Color);
+    color: var(--Primary-Color);
+  }
+
+  &--danger:hover {
+    border-color: rgba(196, 92, 92, 0.5);
+    color: #e08a8a;
+  }
 }
 </style>

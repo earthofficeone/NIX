@@ -1,23 +1,37 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import ImageLightbox from '@/components/transaction/ImageLightbox.vue'
 import type { Transaction } from '@/types'
 import { formatCurrency, formatShortDate } from '@/utils/format'
 import { useRouter } from 'vue-router'
 
-defineProps<{ transaction: Transaction }>()
+const props = defineProps<{ transaction: Transaction }>()
 
 const router = useRouter()
+const lightboxOpen = ref(false)
 
 function goEdit(id: string) {
   router.push({ name: 'edit-record', params: { id } })
+}
+
+function openImage(e: Event) {
+  e.stopPropagation()
+  if (props.transaction.image) lightboxOpen.value = true
 }
 </script>
 
 <template>
   <article class="tx-card lux-card" @click="goEdit(transaction.id)">
     <div class="tx-card__main">
-      <div v-if="transaction.image" class="tx-card__thumb">
+      <button
+        v-if="transaction.image"
+        type="button"
+        class="tx-card__thumb"
+        aria-label="ดูรูปขยาย"
+        @click="openImage"
+      >
         <img :src="transaction.image" alt="" />
-      </div>
+      </button>
       <div class="tx-card__body">
         <div class="tx-card__row">
           <span class="lux-badge" :class="`lux-badge--${transaction.type}`">
@@ -35,6 +49,13 @@ function goEdit(id: string) {
         <time class="tx-card__date">{{ formatShortDate(transaction.date) }}</time>
       </div>
     </div>
+
+    <ImageLightbox
+      v-if="transaction.image"
+      v-model="lightboxOpen"
+      :src="transaction.image"
+      :alt="transaction.title"
+    />
   </article>
 </template>
 
@@ -59,13 +80,22 @@ function goEdit(id: string) {
   flex-shrink: 0;
   width: 3.5rem;
   height: 3.5rem;
+  padding: 0;
+  border: 1px solid rgba(201, 169, 110, 0.2);
   border-radius: 0.5rem;
   overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+  cursor: zoom-in;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+  }
+
+  &:hover {
+    border-color: var(--Primary-Color);
   }
 }
 

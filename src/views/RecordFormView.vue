@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import CalculatorKeypad from '@/components/calculator/CalculatorKeypad.vue'
+import CalculatorSheet from '@/components/calculator/CalculatorSheet.vue'
 import TypeToggle from '@/components/transaction/TypeToggle.vue'
 import ImageUpload from '@/components/transaction/ImageUpload.vue'
-import { useCalculator } from '@/composables/useCalculator'
+import { useCalculator, type CalcOperator } from '@/composables/useCalculator'
+import { useCalculatorKeyboard } from '@/composables/useCalculatorKeyboard'
+import type { SlipQrParseResult } from '@/composables/useSlipQr'
 import { useTransactionStore } from '@/stores/transactions'
 import type { TransactionType } from '@/types'
-import { todayISO } from '@/utils/format'
+import { formatCurrency, todayISO } from '@/utils/format'
 
 const props = defineProps<{ id?: string }>()
 
@@ -24,11 +26,50 @@ const note = ref('')
 const date = ref(todayISO())
 const image = ref<string | undefined>()
 
-const { display, numericValue, appendDigit, backspace, clear, setValue } = useCalculator()
+const saving = ref(false)
+const loadingRecord = ref(false)
 
-onMounted(() => {
+const calc = useCalculator()
+const {
+  display,
+  displayText,
+  liveResult,
+  numericValue,
+  appendDigit,
+  setOperator,
+  equals,
+  backspace,
+  clear,
+  setValue,
+  handleCalculatorKey,
+  onAmountBlur,
+  onAmountKeydown,
+} = calc
+
+const amountInputId = 'amount'
+const amountInputRef = ref<HTMLInputElement | null>(null)
+const keyboardOpen = ref(false)
+
+useCalculatorKeyboard(handleCalculatorKey, {
+  enabled: () => keyboardOpen.value && !saving.value && !loadingRecord.value,
+  amountInputId,
+})
+
+function openKeyboard() {
+  keyboardOpen.value = true
+  amountInputRef.value?.focus()
+}
+
+function onSheetDone() {
+  onAmountBlur()
+  amountInputRef.value?.blur()
+}
+
+onMounted(async () => {
   if (!recordId.value) return
-  const existing = txStore.getById(recordId.value)
+  loadingRecord.value = true
+  const existing = await txStore.fetchById(recordId.value)
+  loadingRecord.value = false
   if (!existing) {
     router.replace({ name: 'records' })
     return
@@ -41,41 +82,84 @@ onMounted(() => {
   setValue(String(existing.amount))
 })
 
-function save() {
+async function save() {
+  if (display.value && /[+−×÷]/.test(display.value)) {
+    equals()
+  }
   if (numericValue.value <= 0) {
     alert('กรุณากรอกจำนวนเงิน')
     return
   }
+  saving.value = true
   const payload = {
     type: type.value,
     amount: numericValue.value,
     title: title.value,
     note: note.value,
-    image: image.value,
+    image: image.value || '',
     date: date.value,
   }
+  let ok = false
   if (isEdit.value && recordId.value) {
-    txStore.update(recordId.value, payload)
+    ok = await txStore.update(recordId.value, payload)
   } else {
-    txStore.create(payload)
+    ok = (await txStore.create(payload)) !== null
   }
-  router.push({ name: 'records' })
+  saving.value = false
+  if (ok) router.push({ name: 'records' })
+  else if (txStore.error) alert(txStore.error)
 }
 
-function removeRecord() {
+async function removeRecord() {
   if (!recordId.value) return
   if (!confirm('ลบรายการนี้?')) return
-  txStore.remove(recordId.value)
-  router.push({ name: 'records' })
+  saving.value = true
+  const ok = await txStore.remove(recordId.value)
+  saving.value = false
+  if (ok) router.push({ name: 'records' })
 }
 
 function cancel() {
   router.back()
 }
+
+function onKeypadDigit(d: string) {
+  appendDigit(d)
+}
+
+function onKeypadOperator(op: CalcOperator) {
+  setOperator(op)
+}
+
+function onKeypadEquals() {
+  equals()
+}
+
+function onKeypadBackspace() {
+  backspace()
+}
+
+function onKeypadClear() {
+  clear()
+}
+
+function onSlipParsed(result: SlipQrParseResult) {
+  if (result.status !== 'success') return
+
+  if (result.amount != null && result.amount > 0) {
+    setValue(String(result.amount))
+  }
+  if (result.title && !title.value.trim()) {
+    title.value = result.title
+  }
+  if (result.note && !note.value.trim()) {
+    note.value = result.note
+  }
+}
 </script>
 
 <template>
-  <div class="form-page">
+  <div class="form-page" :class="{ 'form-page--keyboard': keyboardOpen }">
     <header class="form-page__header">
       <button type="button" class="form-page__back" @click="cancel">‹ กลับ</button>
       <h1 class="lux-title">{{ isEdit ? 'แก้ไขรายการ' : 'บันทึกใหม่' }}</h1>
@@ -86,23 +170,48 @@ function cancel() {
 
       <div class="amount-block lux-card">
         <span class="lux-label">จำนวนเงิน (฿)</span>
-        <div
-          class="lux-amount-display"
-          :class="type === 'income' ? 'lux-amount-display--income' : 'lux-amount-display--expense'"
-        >
-          {{ display }}
-        </div>
-        <CalculatorKeypad
-          @digit="appendDigit"
-          @backspace="backspace"
-          @clear="clear"
+        <input
+          :id="amountInputId"
+          ref="amountInputRef"
+          type="text"
+          readonly
+          inputmode="none"
+          autocomplete="off"
+          class="lux-amount-input lux-amount-input--tap lux-amount-input--expr"
+          :class="type === 'income' ? 'lux-amount-input--income' : 'lux-amount-input--expense'"
+          placeholder="0"
+          :value="displayText"
+          @click="openKeyboard"
+          @focus="openKeyboard"
+          @keydown="onAmountKeydown"
         />
+        <p v-if="liveResult && !keyboardOpen" class="amount-preview">
+          = {{ formatCurrency(numericValue) }}
+        </p>
       </div>
+
+      <CalculatorSheet
+        v-model="keyboardOpen"
+        :display="displayText"
+        :live-result="liveResult ? formatCurrency(numericValue) : undefined"
+        @digit="onKeypadDigit"
+        @operator="onKeypadOperator"
+        @equals="onKeypadEquals"
+        @backspace="onKeypadBackspace"
+        @clear="onKeypadClear"
+        @done="onSheetDone"
+      />
 
       <div class="fields">
         <div class="field">
           <label class="lux-label" for="title">หัวข้อ</label>
-          <input id="title" v-model="title" type="text" class="lux-input" placeholder="เช่น อาหาร, เงินเดือน" />
+          <input
+            id="title"
+            v-model="title"
+            type="text"
+            class="lux-input"
+            placeholder="เช่น อาหาร, เงินเดือน"
+          />
         </div>
         <div class="field">
           <label class="lux-label" for="note">รายละเอียด</label>
@@ -118,11 +227,18 @@ function cancel() {
           <label class="lux-label" for="date">วันที่</label>
           <input id="date" v-model="date" type="date" class="lux-input" />
         </div>
-        <ImageUpload v-model="image" />
+        <ImageUpload v-model="image" @parsed="onSlipParsed" />
       </div>
 
-      <button type="button" class="lux-btn lux-btn--gold lux-btn--full" @click="save">
-        {{ isEdit ? 'บันทึกการแก้ไข' : 'บันทึกรายการ' }}
+      <p v-if="loadingRecord" class="form-hint">กำลังโหลดรายการ...</p>
+
+      <button
+        type="button"
+        class="lux-btn lux-btn--gold lux-btn--full"
+        :disabled="saving || loadingRecord"
+        @click="save"
+      >
+        {{ saving ? 'กำลังบันทึก...' : isEdit ? 'บันทึกการแก้ไข' : 'บันทึกรายการ' }}
       </button>
       <button
         v-if="isEdit"
@@ -142,6 +258,11 @@ function cancel() {
   max-width: 480px;
   margin: 0 auto;
   padding: 1.5rem 1.25rem 2.5rem;
+  transition: padding-bottom 0.32s ease;
+
+  &--keyboard {
+    padding-bottom: 1rem;
+  }
 }
 
 .form-page__header {
@@ -189,5 +310,32 @@ function cancel() {
 
 input[type='date'] {
   color-scheme: dark;
+}
+
+.amount-keyboard-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  color: rgba(245, 240, 232, 0.35);
+}
+
+.lux-amount-input--expr {
+  font-size: 1.5rem;
+  letter-spacing: 0.04em;
+}
+
+.amount-preview {
+  margin: 0.35rem 0 0.75rem;
+  text-align: right;
+  font-size: 0.85rem;
+  color: var(--Primary-Color);
+  letter-spacing: 0.02em;
+}
+
+.form-hint {
+  text-align: center;
+  color: rgba(245, 240, 232, 0.45);
+  font-size: 0.85rem;
+  margin: 0;
 }
 </style>

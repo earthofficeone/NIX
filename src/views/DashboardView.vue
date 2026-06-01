@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import TransactionCard from '@/components/transaction/TransactionCard.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -32,6 +32,9 @@ const monthLabel = computed(() => {
     new Date(y!, m! - 1, 1),
   )
 })
+
+onMounted(() => txStore.fetchList(selectedMonth.value))
+watch(selectedMonth, (m) => txStore.fetchList(m))
 </script>
 
 <template>
@@ -39,6 +42,8 @@ const monthLabel = computed(() => {
     :title="`สวัสดี, ${auth.currentUser?.name ?? 'คุณ'}`"
     subtitle="สรุปรายเดือน"
   >
+    <p v-if="txStore.loading" class="loading-hint">กำลังโหลด...</p>
+
     <div class="month-picker lux-card">
       <button type="button" class="month-picker__arrow" @click="shiftMonth(-1)">‹</button>
       <span class="month-picker__label">{{ monthLabel }}</span>
@@ -249,5 +254,12 @@ const monthLabel = computed(() => {
   color: rgba(245, 240, 232, 0.35);
   font-size: 0.9rem;
   padding: 2rem;
+}
+
+.loading-hint {
+  text-align: center;
+  color: rgba(245, 240, 232, 0.45);
+  font-size: 0.85rem;
+  margin: 0 0 1rem;
 }
 </style>

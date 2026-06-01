@@ -11,13 +11,13 @@ const email = ref('')
 const password = ref('')
 const error = ref('')
 
-function submit() {
+async function submit() {
   error.value = ''
   if (!email.value || !password.value) {
     error.value = 'กรุณากรอกอีเมลและรหัสผ่าน'
     return
   }
-  const err = auth.login(email.value, password.value)
+  const err = await auth.login(email.value, password.value)
   if (err) {
     error.value = err
     return
@@ -43,7 +43,9 @@ function submit() {
 
       <p v-if="error" class="auth-form__error">{{ error }}</p>
 
-      <button type="submit" class="lux-btn lux-btn--gold lux-btn--full">เข้าสู่ระบบ</button>
+      <button type="submit" class="lux-btn lux-btn--gold lux-btn--full" :disabled="auth.loading">
+        {{ auth.loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ' }}
+      </button>
 
       <p class="auth-form__footer">
         ยังไม่มีบัญชี?

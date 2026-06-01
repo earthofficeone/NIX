@@ -13,7 +13,7 @@ const password = ref('')
 const confirm = ref('')
 const error = ref('')
 
-function submit() {
+async function submit() {
   error.value = ''
   if (!name.value.trim()) {
     error.value = 'กรุณากรอกชื่อ'
@@ -31,7 +31,7 @@ function submit() {
     error.value = 'รหัสผ่านไม่ตรงกัน'
     return
   }
-  const err = auth.register(name.value, email.value, password.value)
+  const err = await auth.register(name.value, email.value, password.value)
   if (err) {
     error.value = err
     return
@@ -65,7 +65,9 @@ function submit() {
 
       <p v-if="error" class="auth-form__error">{{ error }}</p>
 
-      <button type="submit" class="lux-btn lux-btn--gold lux-btn--full">สร้างบัญชี</button>
+      <button type="submit" class="lux-btn lux-btn--gold lux-btn--full" :disabled="auth.loading">
+        {{ auth.loading ? 'กำลังสมัคร...' : 'สร้างบัญชี' }}
+      </button>
 
       <p class="auth-form__footer">
         มีบัญชีแล้ว?
