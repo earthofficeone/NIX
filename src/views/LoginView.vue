@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -10,6 +10,22 @@ const router = useRouter()
 const email = ref('')
 const password = ref('')
 const error = ref('')
+
+const remember = ref(false)
+
+onMounted(() => {
+  remember.value = localStorage.getItem('remember') === 'true'
+  if (remember.value) {
+    email.value = localStorage.getItem('email') || ''
+    password.value = localStorage.getItem('password') || ''
+  }
+})
+
+function rememberChange(event: Event) {
+  const checkbox = event.target as HTMLInputElement
+  remember.value = checkbox.checked
+  localStorage.setItem('remember', remember.value.toString())
+}
 
 async function submit() {
   error.value = ''
@@ -22,6 +38,15 @@ async function submit() {
     error.value = err
     return
   }
+
+  if (remember.value === true) {
+    localStorage.setItem('email', email.value)
+    localStorage.setItem('password', password.value)
+  } else {
+    localStorage.removeItem('email')
+    localStorage.removeItem('password')
+  }
+
   router.push({ name: 'dashboard' })
 }
 </script>
@@ -34,14 +59,37 @@ async function submit() {
 
       <div class="auth-form__field">
         <label class="lux-label" for="email">อีเมล</label>
-        <input id="email" v-model="email" type="email" class="lux-input" placeholder="you@email.com" />
+        <input
+          id="email"
+          v-model="email"
+          type="email"
+          class="lux-input"
+          placeholder="you@email.com"
+        />
       </div>
       <div class="auth-form__field">
         <label class="lux-label" for="password">รหัสผ่าน</label>
-        <input id="password" v-model="password" type="password" class="lux-input" placeholder="••••••••" />
+        <input
+          id="password"
+          v-model="password"
+          type="password"
+          class="lux-input"
+          placeholder="••••••••"
+        />
       </div>
 
       <p v-if="error" class="auth-form__error">{{ error }}</p>
+
+      <div class="auth-form__field flex items-center gap-2 justify-end mt-[-10px]">
+        <input
+          type="checkbox"
+          id="remember"
+          v-model="remember"
+          class="w-4 h-4 accent-(--Primary-Color) cursor-pointer"
+          @change="rememberChange"
+        />
+        <label for="remember" class="cursor-pointer text-sm">จดจำฉัน</label>
+      </div>
 
       <button type="submit" class="lux-btn lux-btn--gold lux-btn--full" :disabled="auth.loading">
         {{ auth.loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ' }}
