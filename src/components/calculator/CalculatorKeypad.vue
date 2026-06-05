@@ -31,23 +31,6 @@ function onDigit(key: string) {
 
 <template>
   <div class="keypad">
-    <div class="keypad__row keypad__row--top">
-      <button type="button" class="key key--action" title="ล้างทั้งหมด" @click="emit('clear')">
-        C
-      </button>
-      <button
-        type="button"
-        class="key key--action"
-        title="ลบทีละหลัก"
-        @click="emit('backspace')"
-      >
-        ⌫
-      </button>
-      <button type="button" class="key key--equals" title="เท่ากับ" @click="emit('equals')">
-        =
-      </button>
-    </div>
-
     <div class="keypad__body">
       <div class="keypad__digits">
         <div v-for="(row, i) in digitRows" :key="i" class="keypad__row">
@@ -60,14 +43,6 @@ function onDigit(key: string) {
             @click="onDigit(key)"
           >
             {{ key }}
-          </button>
-          <button
-            v-if="i === digitRows.length - 1"
-            type="button"
-            class="key key--action"
-            @click="emit('backspace')"
-          >
-            ⌫
           </button>
         </div>
       </div>
@@ -83,6 +58,18 @@ function onDigit(key: string) {
           {{ op.label }}
         </button>
       </div>
+    </div>
+
+    <div class="keypad__row keypad__row--top">
+      <button type="button" class="key key--action" title="ล้างทั้งหมด" @click="emit('clear')">
+        C
+      </button>
+      <button type="button" class="key key--action" title="ลบทีละหลัก" @click="emit('backspace')">
+        ⌫
+      </button>
+      <button type="button" class="key key--equals" title="เท่ากับ" @click="emit('equals')">
+        =
+      </button>
     </div>
   </div>
 </template>

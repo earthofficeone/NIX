@@ -38,10 +38,7 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
 </script>
 
 <template>
-  <MainLayout
-    :title="`สวัสดี, ${auth.currentUser?.name ?? 'คุณ'}`"
-    subtitle="สรุปรายเดือน"
-  >
+  <MainLayout :title="`สวัสดี, ${auth.currentUser?.name ?? 'คุณ'}`" subtitle="สรุปรายเดือน">
     <p v-if="txStore.loading" class="loading-hint">กำลังโหลด...</p>
 
     <div class="month-picker lux-card">
@@ -115,7 +112,7 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
   color: var(--Primary-Color);
   font-size: 1.25rem;
   cursor: pointer;
-  line-height: 1;
+  padding-bottom: 3px !important;
 
   &:hover {
     background: rgba(201, 169, 110, 0.1);

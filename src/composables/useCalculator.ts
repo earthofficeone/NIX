@@ -19,11 +19,7 @@ function formatAmount(n: number): string {
 
 /** ลบช่องว่างและแปลงสัญลักษณ์ก่อนคำนวณ */
 function normalizeExpression(expr: string): string {
-  return expr
-    .replace(/\s+/g, '')
-    .replace(/−/g, '-')
-    .replace(/×/g, '*')
-    .replace(/÷/g, '/')
+  return expr.replace(/\s+/g, '').replace(/−/g, '-').replace(/×/g, '*').replace(/÷/g, '/')
 }
 
 function charToOp(ch: string): CalcOperator | null {

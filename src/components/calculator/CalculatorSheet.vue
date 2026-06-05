@@ -36,13 +36,7 @@ onUnmounted(() => {
 <template>
   <Teleport to="body">
     <Transition name="calc-sheet">
-      <div
-        v-if="open"
-        class="calc-sheet"
-        role="dialog"
-        aria-modal="true"
-        aria-label="แป้นตัวเลข"
-      >
+      <div v-if="open" class="calc-sheet" role="dialog" aria-modal="true" aria-label="แป้นตัวเลข">
         <button type="button" class="calc-sheet__backdrop" aria-label="ปิด" @click="close" />
 
         <div class="calc-sheet__panel" @mousedown.prevent>

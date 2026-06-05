@@ -19,6 +19,11 @@ onMounted(() => {
     email.value = localStorage.getItem('email') || ''
     password.value = localStorage.getItem('password') || ''
   }
+
+  const token = localStorage.getItem('token') || ''
+  if (token) {
+    router.push('/')
+  }
 })
 
 function rememberChange(event: Event) {

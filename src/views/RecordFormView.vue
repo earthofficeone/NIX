@@ -161,7 +161,13 @@ function onSlipParsed(result: SlipQrParseResult) {
 <template>
   <div class="form-page" :class="{ 'form-page--keyboard': keyboardOpen }">
     <header class="form-page__header">
-      <button type="button" class="form-page__back" @click="cancel">‹ กลับ</button>
+      <button
+        type="button"
+        class="form-page__back flex items-center gap-1 hover:scale-105"
+        @click="cancel"
+      >
+        <span class="text-lg">‹</span> กลับ
+      </button>
       <h1 class="lux-title">{{ isEdit ? 'แก้ไขรายการ' : 'บันทึกใหม่' }}</h1>
     </header>
 

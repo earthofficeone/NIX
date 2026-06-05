@@ -67,6 +67,7 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
   color: var(--Primary-Color);
   font-size: 1.25rem;
   cursor: pointer;
+  padding-bottom: 3px !important;
 }
 
 .month-picker__label {
