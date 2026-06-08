@@ -30,128 +30,78 @@ function onDigit(key: string) {
 </script>
 
 <template>
-  <div class="keypad">
-    <div class="keypad__body">
-      <div class="keypad__digits">
-        <div v-for="(row, i) in digitRows" :key="i" class="keypad__row">
+  <div class="flex flex-col gap-2">
+    <!-- main keypad -->
+    <div class="grid grid-cols-[1fr_auto] gap-2">
+      <!-- digits -->
+      <div class="flex flex-col gap-2">
+        <div v-for="(row, i) in digitRows" :key="i" class="grid grid-cols-3 gap-2">
           <button
             v-for="key in row"
             :key="key"
             type="button"
-            class="key"
-            :class="{ 'key--zero': key === '0' }"
             @click="onDigit(key)"
+            :class="[
+              // base key
+              'min-h-11 rounded-xl border border-(--Border-Color)',
+              'bg-black/50 text-(--Text-Color) text-xl font-light',
+              'cursor-pointer transition-all duration-150',
+              'active:scale-95 active:bg-(--Border-Color)',
+
+              // zero key
+              key === '0' && 'col-span-2',
+            ]"
           >
             {{ key }}
           </button>
         </div>
       </div>
 
-      <div class="keypad__ops">
+      <!-- operators -->
+      <div class="grid grid-rows-4 gap-2">
         <button
           v-for="op in operators"
           :key="op.key"
           type="button"
-          class="key key--op"
           @click="emit('operator', op.key)"
+          class="min-h-11 min-w-11 rounded-xl border bg-(--Primary-Color)/5 text-(--Primary-Color) text-[1.35rem] font-light cursor-pointer transition-all duration-150 active:scale-95 active:bg-(--Border-Color)"
         >
           {{ op.label }}
         </button>
       </div>
     </div>
 
-    <div class="keypad__row keypad__row--top">
-      <button type="button" class="key key--action" title="ล้างทั้งหมด" @click="emit('clear')">
+    <!-- actions -->
+    <div class="grid grid-cols-3 gap-2">
+      <!-- clear -->
+      <button
+        type="button"
+        title="ล้างทั้งหมด"
+        @click="emit('clear')"
+        class="min-h-11 rounded-xl border border-(--Border-Color) bg-black/50 text-(--Primary-Color) text-base font-light cursor-pointer transition-all duration-150 active:scale-95 active:bg-(--Border-Color)"
+      >
         C
       </button>
-      <button type="button" class="key key--action" title="ลบทีละหลัก" @click="emit('backspace')">
+
+      <!-- backspace -->
+      <button
+        type="button"
+        title="ลบทีละหลัก"
+        @click="emit('backspace')"
+        class="min-h-11 rounded-xl border border-(--Border-Color) bg-black/50 text-(--Primary-Color) text-base font-light cursor-pointer transition-all duration-150 active:scale-95 active:bg-(--Border-Color)"
+      >
         ⌫
       </button>
-      <button type="button" class="key key--equals" title="เท่ากับ" @click="emit('equals')">
+
+      <!-- equals -->
+      <button
+        type="button"
+        title="เท่ากับ"
+        @click="emit('equals')"
+        class="min-h-11 rounded-xl border border-transparent text-(--Text-Color) text-[1.2rem] font-medium bg-gradient-to-r from-(--Primary-Color) to-(--Primary-Color)/50 cursor-pointer transition-all duration-150 active:scale-95 active:bg-gradient-to-r from-(--Primary-Color)/50 to-(--Primary-Color)/100"
+      >
         =
       </button>
     </div>
   </div>
 </template>
-
-<style scoped lang="scss">
-.keypad {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.keypad__body {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.5rem;
-}
-
-.keypad__digits {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.keypad__row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-
-  &--top {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-}
-
-.keypad__ops {
-  display: grid;
-  grid-template-rows: repeat(4, 1fr);
-  gap: 0.5rem;
-}
-
-.key {
-  min-height: 2.75rem;
-  border: 1px solid rgba(201, 169, 110, 0.15);
-  border-radius: 0.75rem;
-  background: rgba(0, 0, 0, 0.4);
-  color: #f5f0e8;
-  font-size: 1.25rem;
-  font-weight: 300;
-  cursor: pointer;
-  transition: all 0.15s;
-
-  &:active {
-    transform: scale(0.96);
-    background: rgba(201, 169, 110, 0.15);
-  }
-
-  &--zero {
-    grid-column: span 2;
-  }
-
-  &--action {
-    color: var(--Primary-Color);
-    font-size: 1rem;
-  }
-
-  &--op {
-    min-width: 2.75rem;
-    color: var(--Primary-Color);
-    background: rgba(201, 169, 110, 0.08);
-    border-color: rgba(201, 169, 110, 0.28);
-    font-size: 1.35rem;
-  }
-
-  &--equals {
-    color: #1a1510;
-    background: linear-gradient(135deg, #d4b87a 0%, #a8894a 100%);
-    border-color: transparent;
-    font-weight: 500;
-    font-size: 1.2rem;
-
-    &:active {
-      background: linear-gradient(135deg, #e0c88a 0%, #b89555 100%);
-    }
-  }
-}
-</style>

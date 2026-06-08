@@ -51,7 +51,6 @@ export const useTransactionStore = defineStore('transactions', () => {
     return [...map.entries()]
       .map(([label, total]) => ({ label, total }))
       .sort((a, b) => b.total - a.total)
-      .slice(0, 5)
   }
 
   function getById(id: string) {

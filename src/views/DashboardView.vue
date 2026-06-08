@@ -65,10 +65,9 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
       </span>
       <span class="balance__meta">{{ summary.count }} รายการในเดือนนี้</span>
     </div>
-
     <section v-if="breakdown.length" class="section">
       <h2 class="section__title">รายจ่ายตามหมวด</h2>
-      <div class="breakdown lux-card">
+      <div class="breakdown lux-card overflow-y-auto max-h-[230px]">
         <div v-for="item in breakdown" :key="item.label" class="breakdown__row">
           <div class="breakdown__head">
             <span>{{ item.label }}</span>

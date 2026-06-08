@@ -58,11 +58,13 @@ async function submit() {
 
 <template>
   <AuthLayout>
-    <form class="auth-form lux-card" @submit.prevent="submit">
-      <h2 class="auth-form__title">เข้าสู่ระบบ</h2>
-      <p class="lux-subtitle auth-form__desc">จัดการรายรับรายจ่ายอย่างมีระดับ</p>
+    <form class="py-8 px-7 lux-card" @submit.prevent="submit">
+      <h2 class="text-[1.35rem] font-light text-[#f5f0e8] mb-[0.35rem] tracking-[0.06em]">
+        เข้าสู่ระบบ
+      </h2>
+      <p class="lux-subtitle mb-7">จัดการรายรับรายจ่ายอย่างมีระดับ</p>
 
-      <div class="auth-form__field">
+      <div class="mb-[1.1rem]">
         <label class="lux-label" for="email">อีเมล</label>
         <input
           id="email"
@@ -72,7 +74,7 @@ async function submit() {
           placeholder="you@email.com"
         />
       </div>
-      <div class="auth-form__field">
+      <div class="mb-[1.1rem]">
         <label class="lux-label" for="password">รหัสผ่าน</label>
         <input
           id="password"
@@ -83,9 +85,9 @@ async function submit() {
         />
       </div>
 
-      <p v-if="error" class="auth-form__error">{{ error }}</p>
+      <p v-if="error" class="text-(--Danger-Color) text-[0.85rem] mb-4">{{ error }}</p>
 
-      <div class="auth-form__field flex items-center gap-2 justify-end mt-[-10px]">
+      <div class="mb-7 flex items-center gap-2 justify-end mt-[-10px]">
         <input
           type="checkbox"
           id="remember"
@@ -100,55 +102,10 @@ async function submit() {
         {{ auth.loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ' }}
       </button>
 
-      <p class="auth-form__footer">
+      <p class="text-center mt-6 text-[0.85rem] text-[rgba(245,240,232,0.5)]">
         ยังไม่มีบัญชี?
-        <RouterLink to="/register">สมัครสมาชิก</RouterLink>
+        <RouterLink to="/register" class="text-(--Primary-Color) ml-1">สมัครสมาชิก</RouterLink>
       </p>
     </form>
   </AuthLayout>
 </template>
-
-<style scoped lang="scss">
-.auth-form {
-  padding: 2rem 1.75rem;
-}
-
-.auth-form__title {
-  font-size: 1.35rem;
-  font-weight: 300;
-  color: #f5f0e8;
-  margin: 0 0 0.35rem;
-  letter-spacing: 0.06em;
-}
-
-.auth-form__desc {
-  margin-bottom: 1.75rem;
-}
-
-.auth-form__field {
-  margin-bottom: 1.1rem;
-}
-
-.auth-form__error {
-  color: #e08a8a;
-  font-size: 0.85rem;
-  margin-bottom: 1rem;
-}
-
-.auth-form__footer {
-  text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.85rem;
-  color: rgba(245, 240, 232, 0.5);
-
-  a {
-    color: var(--Primary-Color);
-    text-decoration: none;
-    margin-left: 0.25rem;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
-</style>

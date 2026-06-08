@@ -1,22 +1,13 @@
-// $background-color: #f7f5f1; // สีตามเว็บตัวอย่าง
-
-
-$background-color: #121212; // หรูหราระดับ High-End
-// $background-color: #F9F9F9;  // แฟชั่น ทันสมัย Clean
-// $background-color: #1B2623; // ดูสุขุม มีระดับ
-// $background-color: #043927; // Deep Forest Green (เขียวป่าลึก)
-
-
-
-
-// $primary-color: #9d5248; // สีตามเว็บตัวอย่าง
-
-// Gold options — uncomment one:
-$primary-color: #C9A96E;   // Warm Gold     — ทอง warm นุ่ม หรู
-// $primary-color: #CFB53B; // Old Gold      — ทองโบราณ มีลึก
-// $primary-color: #E8D5A3; // Champagne Gold — ทองอ่อน แชมเปญ
-
 :root {
-  --Background-Color: #{$background-color};
-  --Primary-Color: #{$primary-color};
+  --Background-Color: #121212;
+  --Primary-Color: #C9A96E;
+  --Danger-Color: #c45c5c;
+  --Success-Color: #6b9d7a;
+  --Text-Color: #f5f0e8;
+  --Border-Color: rgba(201, 169, 110, 0.15);
+
+  // rgba colors
+  --Card-Border: rgba(201, 169, 110, 0.22);
+  --Muted-Color: rgba(245, 240, 232, 0.55);
+  --Card-Background: rgba(255, 255, 255, 0.04);
 }

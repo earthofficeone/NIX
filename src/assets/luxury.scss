@@ -1,15 +1,6 @@
-$gold: var(--Primary-Color);
-$bg: var(--Background-Color);
-$card-bg: rgba(255, 255, 255, 0.04);
-$card-border: rgba(201, 169, 110, 0.22);
-$text: #f5f0e8;
-$muted: rgba(245, 240, 232, 0.55);
-$danger: #c45c5c;
-$success: #6b9d7a;
-
 .lux-card {
-  background: $card-bg;
-  border: 1px solid $card-border;
+  background: var(--Card-Background);
+  border: 1px solid var(--Card-Border);
   border-radius: 1.25rem;
   backdrop-filter: blur(12px);
   box-shadow:
@@ -45,8 +36,8 @@ $success: #6b9d7a;
 
   &--ghost {
     background: transparent;
-    color: $gold;
-    border: 1px solid $card-border;
+    color: var(--Primary-Color);
+    border: 1px solid var(--Card-Border);
 
     &:hover {
       background: rgba(201, 169, 110, 0.08);
@@ -64,13 +55,13 @@ $success: #6b9d7a;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(201, 169, 110, 0.18);
   border-radius: 0.75rem;
-  color: $text;
+  color: var(--Text-Color);
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
 
   &::placeholder {
-    color: $muted;
+    color: var(--Muted-Color);
   }
 
   &:focus {
@@ -83,7 +74,7 @@ $success: #6b9d7a;
   font-size: 0.7rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: $muted;
+  color: var(--Muted-Color);
   margin-bottom: 0.4rem;
 }
 
@@ -91,12 +82,12 @@ $success: #6b9d7a;
   font-size: 1.75rem;
   font-weight: 300;
   letter-spacing: 0.04em;
-  color: $text;
+  color: var(--Text-Color);
 }
 
 .lux-subtitle {
   font-size: 0.85rem;
-  color: $muted;
+  color: var(--Muted-Color);
   letter-spacing: 0.08em;
 }
 
@@ -105,17 +96,17 @@ $success: #6b9d7a;
   font-size: 2rem;
   font-weight: 300;
   letter-spacing: 0.02em;
-  color: $text;
+  color: var(--Text-Color);
   text-align: right;
   min-height: 3rem;
   word-break: break-all;
 
   &--income {
-    color: $success;
+    color: var(--Success-Color);
   }
 
   &--expense {
-    color: $danger;
+    color: var(--Danger-Color);
   }
 }
 
@@ -148,7 +139,7 @@ $success: #6b9d7a;
 
 .lux-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, $card-border, transparent);
+  background: linear-gradient(90deg, transparent, var(--Card-Border), transparent);
   margin: 1.25rem 0;
 }
 
@@ -162,12 +153,12 @@ $success: #6b9d7a;
 
   &--income {
     background: rgba(107, 157, 122, 0.2);
-    color: $success;
+    color: var(--Success-Color);
   }
 
   &--expense {
     background: rgba(196, 92, 92, 0.2);
-    color: $danger;
+    color: var(--Danger-Color);
   }
 }
 
