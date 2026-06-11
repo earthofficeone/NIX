@@ -20,9 +20,8 @@ onMounted(() => {
     password.value = localStorage.getItem('password') || ''
   }
 
-  const token = localStorage.getItem('token') || ''
-  if (token) {
-    router.push('/')
+  if (auth.isAuthenticated) {
+    router.replace({ name: 'dashboard' })
   }
 })
 

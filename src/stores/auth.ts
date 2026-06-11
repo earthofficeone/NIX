@@ -8,23 +8,33 @@ export const useAuthStore = defineStore('auth', () => {
   const currentUser = ref<User | null>(null)
   const ready = ref(false)
   const loading = ref(false)
+  let initPromise: Promise<void> | null = null
 
   const isAuthenticated = computed(() => !!currentUser.value)
 
   async function init() {
-    ready.value = false
-    if (!getToken()) {
-      currentUser.value = null
-      ready.value = true
-      return
-    }
+    if (initPromise) return initPromise
+
+    initPromise = (async () => {
+      if (!getToken()) {
+        currentUser.value = null
+        ready.value = true
+        return
+      }
+      try {
+        currentUser.value = await api.getMe()
+      } catch {
+        setToken(null)
+        currentUser.value = null
+      } finally {
+        ready.value = true
+      }
+    })()
+
     try {
-      currentUser.value = await api.getMe()
-    } catch {
-      setToken(null)
-      currentUser.value = null
+      await initPromise
     } finally {
-      ready.value = true
+      initPromise = null
     }
   }
 

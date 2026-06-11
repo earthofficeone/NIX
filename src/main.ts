@@ -11,9 +11,9 @@ import { useAuthStore } from '@/stores/auth'
 const app = createApp(App)
 const pinia = createPinia()
 app.use(pinia)
-
-const auth = useAuthStore()
-await auth.init()
-
 app.use(router)
+
+// Mount immediately — auth.init() runs in App.vue so a slow API never leaves a blank screen.
+useAuthStore().init()
+
 app.mount('#app')
