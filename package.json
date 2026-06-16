@@ -9,7 +9,15 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "format": "prettier --write --experimental-cli src/"
+    "format": "prettier --write --experimental-cli src/",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{vue,ts,js,mjs,cjs}": [
+      "prettier --write --experimental-cli",
+      "eslint --fix"
+    ],
+    "*.{json,css,md,html}": "prettier --write --experimental-cli"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",
@@ -23,7 +31,12 @@
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.12.2",
     "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/eslint-config-typescript": "^14.8.0",
     "@vue/tsconfig": "^0.9.1",
+    "eslint": "^10.5.0",
+    "eslint-plugin-vue": "^10.9.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
     "npm-run-all2": "^8.0.4",
     "prettier": "3.8.3",
     "sass": "^1.100.0",
