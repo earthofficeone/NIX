@@ -12,6 +12,13 @@ const error = ref('')
 const success = ref('')
 const loading = ref(false)
 
+function goToRecovery() {
+  router.push({
+    name: 'reset-password',
+    query: { email: email.value, recovery: '1' },
+  })
+}
+
 async function submit() {
   error.value = ''
   success.value = ''
@@ -25,6 +32,10 @@ async function submit() {
     const res = await authApi.forgotPassword({ email: email.value })
     success.value = res.message
   } catch (e) {
+    if (e instanceof ApiError && (e.recoveryAvailable || e.status === 408)) {
+      goToRecovery()
+      return
+    }
     error.value = e instanceof ApiError ? e.message : 'เกิดข้อผิดพลาด'
   } finally {
     loading.value = false
@@ -79,7 +90,18 @@ function goToReset() {
         ใส่รหัสยืนยัน
       </button>
 
-      <p class="text-center mt-6 text-[0.85rem] text-(--Muted-Color)">
+      <p class="text-center mt-5 text-[0.85rem] text-(--Muted-Color)">
+        ส่งอีเมลไม่ได้?
+        <button
+          type="button"
+          class="text-(--Primary-Color) ml-1 bg-transparent border-none cursor-pointer p-0"
+          @click="goToRecovery"
+        >
+          ใช้รหัสรับแทน
+        </button>
+      </p>
+
+      <p class="text-center mt-4 text-[0.85rem] text-(--Muted-Color)">
         <RouterLink to="/login" class="text-(--Primary-Color)">กลับไปเข้าสู่ระบบ</RouterLink>
       </p>
     </form>

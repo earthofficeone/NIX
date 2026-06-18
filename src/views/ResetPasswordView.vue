@@ -14,12 +14,14 @@ const password = ref('')
 const confirm = ref('')
 const error = ref('')
 const loading = ref(false)
+const useRecovery = ref(false)
 
 onMounted(() => {
   const q = route.query.email
   if (typeof q === 'string') {
     email.value = q
   }
+  useRecovery.value = route.query.recovery === '1'
 })
 
 async function submit() {
@@ -63,7 +65,20 @@ async function submit() {
       <h2 class="text-[1.35rem] font-light text-(--Text-Color) mb-[0.35rem] tracking-[0.06em]">
         ตั้งรหัสผ่านใหม่
       </h2>
-      <p class="lux-subtitle mb-7">ใส่รหัสยืนยันจากอีเมลและรหัสผ่านใหม่</p>
+      <p class="lux-subtitle mb-7">
+        {{
+          useRecovery
+            ? 'ใส่รหัสรับและรหัสผ่านใหม่'
+            : 'ใส่รหัสยืนยันจากอีเมลและรหัสผ่านใหม่'
+        }}
+      </p>
+
+      <p
+        v-if="useRecovery"
+        class="text-[0.85rem] text-(--Muted-Color) mb-5 px-3 py-2 rounded border border-(--Border-Color, #333)"
+      >
+        ไม่ได้รับอีเมลหรือส่งไม่สำเร็จ — ใส่รหัสรับในช่องรหัสยืนยัน
+      </p>
 
       <div class="mb-[1.1rem]">
         <label class="lux-label" for="email">อีเมล</label>
@@ -76,7 +91,9 @@ async function submit() {
         />
       </div>
       <div class="mb-[1.1rem]">
-        <label class="lux-label" for="code">รหัสยืนยัน</label>
+        <label class="lux-label" for="code">{{
+          useRecovery ? 'รหัสรับ' : 'รหัสยืนยัน'
+        }}</label>
         <input
           id="code"
           v-model="code"

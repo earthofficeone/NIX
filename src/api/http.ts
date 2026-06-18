@@ -5,14 +5,17 @@ const TOKEN_KEY = 'nix_token'
 interface ApiEnvelope<T> {
   data?: T
   error?: string
+  recovery_available?: boolean
 }
 
 export class ApiError extends Error {
   status: number
+  recoveryAvailable: boolean
 
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number, recoveryAvailable = false) {
     super(message)
     this.status = status
+    this.recoveryAvailable = recoveryAvailable
   }
 }
 
@@ -61,7 +64,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 
   const body = (await res.json()) as ApiEnvelope<T>
   if (!res.ok) {
-    throw new ApiError(body.error || 'เกิดข้อผิดพลาด', res.status)
+    throw new ApiError(body.error || 'เกิดข้อผิดพลาด', res.status, body.recovery_available === true)
   }
   return body.data as T
 }
