@@ -84,6 +84,12 @@ async function submit() {
         />
       </div>
 
+      <p class="text-right mt-[-6px] mb-4">
+        <RouterLink to="/forgot-password" class="text-[0.8rem] text-(--Primary-Color)">
+          ลืมรหัสผ่าน?
+        </RouterLink>
+      </p>
+
       <p v-if="error" class="text-(--Danger-Color) text-[0.85rem] mb-4">{{ error }}</p>
 
       <div class="mb-7 flex items-center gap-2 justify-end mt-[-10px]">
