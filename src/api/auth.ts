@@ -32,6 +32,7 @@ export const authApi = {
     return request<MessageResponse>('/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify(body),
+      timeoutMs: 45_000,
     })
   },
 

@@ -27,21 +27,26 @@ export function setToken(token: string | null) {
 
 const REQUEST_TIMEOUT_MS = 15_000
 
-export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+export type RequestOptions = RequestInit & {
+  timeoutMs?: number
+}
+
+export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const { timeoutMs = REQUEST_TIMEOUT_MS, ...fetchOptions } = options
   const token = getToken()
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string>),
+    ...(fetchOptions.headers as Record<string, string>),
   }
   if (token) headers.Authorization = `Bearer ${token}`
 
   const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
 
   let res: Response
   try {
     res = await fetch(`${BASE}${path}`, {
-      ...options,
+      ...fetchOptions,
       headers,
       signal: controller.signal,
     })
