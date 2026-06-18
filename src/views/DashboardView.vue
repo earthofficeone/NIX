@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronLeft, ChevronRight } from '@lucide/vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import TransactionCard from '@/components/transaction/TransactionCard.vue'
@@ -42,9 +43,13 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
     <p v-if="txStore.loading" class="loading-hint">กำลังโหลด...</p>
 
     <div class="month-picker lux-card">
-      <button type="button" class="month-picker__arrow" @click="shiftMonth(-1)">‹</button>
+      <button type="button" class="month-picker__arrow" aria-label="เดือนก่อนหน้า" @click="shiftMonth(-1)">
+        <ChevronLeft :size="20" :stroke-width="1.75" aria-hidden="true" />
+      </button>
       <span class="month-picker__label">{{ monthLabel }}</span>
-      <button type="button" class="month-picker__arrow" @click="shiftMonth(1)">›</button>
+      <button type="button" class="month-picker__arrow" aria-label="เดือนถัดไป" @click="shiftMonth(1)">
+        <ChevronRight :size="20" :stroke-width="1.75" aria-hidden="true" />
+      </button>
     </div>
 
     <div class="stats-grid">
@@ -105,23 +110,25 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
 .month-picker__arrow {
   width: 2.25rem;
   height: 2.25rem;
-  border: 1px solid rgba(201, 169, 110, 0.2);
+  border: 1px solid var(--Border-Color);
   border-radius: 50%;
   background: transparent;
   color: var(--Primary-Color);
-  font-size: 1.25rem;
   cursor: pointer;
-  padding-bottom: 3px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 
   &:hover {
-    background: rgba(201, 169, 110, 0.1);
+    background: var(--Item-Hover);
   }
 }
 
 .month-picker__label {
   font-size: 1rem;
   letter-spacing: 0.06em;
-  color: #f5f0e8;
+  color: var(--Text-Color);
 }
 
 .stats-grid {
@@ -140,7 +147,7 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
     font-size: 0.65rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(245, 240, 232, 0.45);
+    color: var(--Label-Color);
     margin-bottom: 0.35rem;
   }
 
@@ -150,11 +157,11 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
   }
 
   &--income .stat__value {
-    color: #8ec49a;
+    color: var(--Success-Text);
   }
 
   &--expense .stat__value {
-    color: #e08a8a;
+    color: var(--Danger-Text);
   }
 }
 
@@ -168,7 +175,7 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
     font-size: 0.65rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: rgba(245, 240, 232, 0.45);
+    color: var(--Label-Color);
     margin-bottom: 0.5rem;
   }
 
@@ -180,7 +187,7 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
     letter-spacing: 0.02em;
 
     &--neg {
-      color: #e08a8a;
+      color: var(--Danger-Text);
     }
   }
 
@@ -188,7 +195,7 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
     display: block;
     margin-top: 0.5rem;
     font-size: 0.75rem;
-    color: rgba(245, 240, 232, 0.4);
+    color: var(--Muted-Color);
   }
 }
 
@@ -199,7 +206,7 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
     font-size: 0.75rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: rgba(245, 240, 232, 0.45);
+    color: var(--Label-Color);
     margin: 0 0 0.75rem;
     font-weight: 400;
   }
@@ -220,20 +227,20 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
     display: flex;
     justify-content: space-between;
     font-size: 0.85rem;
-    color: #f5f0e8;
+    color: var(--Text-Color);
     margin-bottom: 0.35rem;
   }
 
   &__bar {
     height: 4px;
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--Bar-Track);
     border-radius: 2px;
     overflow: hidden;
   }
 
   &__fill {
     height: 100%;
-    background: linear-gradient(90deg, #a8894a, #d4b87a);
+    background: var(--Gold-Gradient-Soft);
     border-radius: 2px;
     transition: width 0.4s ease;
   }
@@ -247,14 +254,14 @@ watch(selectedMonth, (m) => txStore.fetchList(m))
 
 .empty {
   text-align: center;
-  color: rgba(245, 240, 232, 0.35);
+  color: var(--Faint-Color);
   font-size: 0.9rem;
   padding: 2rem;
 }
 
 .loading-hint {
   text-align: center;
-  color: rgba(245, 240, 232, 0.45);
+  color: var(--Hint-Color);
   font-size: 0.85rem;
   margin: 0 0 1rem;
 }

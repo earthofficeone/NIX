@@ -43,7 +43,7 @@ async function submit() {
 <template>
   <AuthLayout>
     <form class="py-8 px-7 lux-card" @submit.prevent="submit">
-      <h2 class="text-[1.35rem] font-light text-[#f5f0e8] mb-[0.35rem] tracking-[0.06em]">
+      <h2 class="text-[1.35rem] font-light text-(--Text-Color) mb-[0.35rem] tracking-[0.06em]">
         สมัครสมาชิก
       </h2>
       <p class="lux-subtitle mb-7">เริ่มบันทึกการเงินส่วนตัวของคุณ</p>
@@ -89,7 +89,7 @@ async function submit() {
         {{ auth.loading ? 'กำลังสมัคร...' : 'สร้างบัญชี' }}
       </button>
 
-      <p class="text-center mt-6 text-[0.85rem] text-[rgba(245,240,232,0.5)]">
+      <p class="text-center mt-6 text-[0.85rem] text-(--Muted-Color)">
         มีบัญชีแล้ว?
         <RouterLink to="/login" class="text-(--Primary-Color) ml-1">เข้าสู่ระบบ</RouterLink>
       </p>

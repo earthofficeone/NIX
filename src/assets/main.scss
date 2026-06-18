@@ -11,8 +11,15 @@
 body {
   margin: 0;
   background-color: var(--Background-Color);
-  color: #f5f0e8;
+  color: var(--Text-Color);
   -webkit-font-smoothing: antialiased;
+}
+
+[data-theme='light'] body {
+  background-image:
+    radial-gradient(ellipse 90% 55% at 50% -8%, var(--Gradient-Glow) 0%, transparent 72%),
+    linear-gradient(180deg, var(--Background-Color) 0%, var(--Background-Accent) 100%);
+  background-attachment: fixed;
 }
 
 #app {

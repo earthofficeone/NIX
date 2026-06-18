@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Paperclip } from '@lucide/vue'
 import { computed, ref, watch } from 'vue'
 import ImageLightbox from '@/components/transaction/ImageLightbox.vue'
 import { parseSlipFromDataUrl, type SlipQrParseResult } from '@/composables/useSlipQr'
@@ -130,7 +131,7 @@ function openLightbox() {
     </div>
 
     <button v-else type="button" class="upload__trigger" @click="pickImage">
-      <span class="upload__icon">📎</span>
+      <Paperclip class="upload__icon" :size="18" :stroke-width="1.75" aria-hidden="true" />
       <span>แนบรูปสลิป / ใบเสร็จ</span>
     </button>
 
@@ -147,7 +148,7 @@ function openLightbox() {
   margin: 0 0 0.5rem;
   font-size: 0.65rem;
   letter-spacing: 0.06em;
-  color: rgba(245, 240, 232, 0.4);
+  color: var(--Subtle-Color);
 }
 
 .upload__status {
@@ -161,7 +162,7 @@ function openLightbox() {
   }
 
   &--muted {
-    color: rgba(245, 240, 232, 0.45);
+    color: var(--Hint-Color);
   }
 
   &--warn {
@@ -175,7 +176,7 @@ function openLightbox() {
   border: 1px dashed rgba(201, 169, 110, 0.3);
   border-radius: 0.75rem;
   background: transparent;
-  color: rgba(245, 240, 232, 0.6);
+  color: var(--Muted-Color);
   font-size: 0.85rem;
   cursor: pointer;
   display: flex;
@@ -191,7 +192,7 @@ function openLightbox() {
 }
 
 .upload__icon {
-  font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
 .upload__preview-wrap {
@@ -206,7 +207,7 @@ function openLightbox() {
   border: 1px solid rgba(201, 169, 110, 0.25);
   border-radius: 0.75rem;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--Input-Background);
   cursor: zoom-in;
 
   img {
@@ -227,8 +228,8 @@ function openLightbox() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
-  color: #f5f0e8;
+  background: var(--Surface-Overlay);
+  color: var(--Text-Color);
   font-size: 0.8rem;
   letter-spacing: 0.08em;
   opacity: 0;
@@ -246,7 +247,7 @@ function openLightbox() {
   border: 1px solid rgba(201, 169, 110, 0.25);
   border-radius: 0.5rem;
   background: transparent;
-  color: rgba(245, 240, 232, 0.75);
+  color: var(--Text-Color);
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   cursor: pointer;

@@ -22,7 +22,7 @@ export const useAuthStore = defineStore('auth', () => {
         return
       }
       try {
-        currentUser.value = await api.getMe()
+        currentUser.value = await api.auth.me()
       } catch {
         setToken(null)
         currentUser.value = null
@@ -41,7 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function register(name: string, email: string, password: string): Promise<string | null> {
     loading.value = true
     try {
-      const res = await api.register({ name, email, password })
+      const res = await api.auth.register({ name, email, password })
       setToken(res.token)
       currentUser.value = res.user
       return null
@@ -56,7 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(email: string, password: string): Promise<string | null> {
     loading.value = true
     try {
-      const res = await api.login({ email, password })
+      const res = await api.auth.login({ email, password })
       setToken(res.token)
       currentUser.value = res.user
       return null

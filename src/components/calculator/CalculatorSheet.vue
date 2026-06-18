@@ -79,7 +79,7 @@ onUnmounted(() => {
   inset: 0;
   border: none;
   padding: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: var(--Surface-Overlay);
   backdrop-filter: blur(4px);
   cursor: pointer;
 }
@@ -91,10 +91,10 @@ onUnmounted(() => {
   width: 100%;
   max-width: 480px;
   padding: 0.5rem 1rem calc(1rem + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, #1a1a1a 0%, #121212 100%);
-  border-top: 1px solid rgba(201, 169, 110, 0.28);
+  background: var(--Sheet-Background);
+  border-top: 1px solid var(--Card-Border);
   border-radius: 1.25rem 1.25rem 0 0;
-  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--Sheet-Shadow);
 }
 
 .calc-sheet__handle {
@@ -123,7 +123,7 @@ onUnmounted(() => {
   margin: 0;
   font-size: 1.35rem;
   font-weight: 300;
-  color: #f5f0e8;
+  color: var(--Text-Color);
   letter-spacing: 0.03em;
   word-break: break-all;
   line-height: 1.35;
@@ -141,7 +141,7 @@ onUnmounted(() => {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #d4b87a 0%, #a8894a 100%);
+  background: var(--Gold-Gradient);
   color: #1a1510;
   font-size: 0.8rem;
   font-weight: 600;

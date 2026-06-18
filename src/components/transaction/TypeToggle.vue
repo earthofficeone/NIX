@@ -31,9 +31,9 @@ const model = defineModel<TransactionType>({ required: true })
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
   padding: 0.25rem;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--Input-Background);
   border-radius: 9999px;
-  border: 1px solid rgba(201, 169, 110, 0.15);
+  border: 1px solid var(--Border-Color);
 }
 
 .toggle__btn {
@@ -41,7 +41,7 @@ const model = defineModel<TransactionType>({ required: true })
   border: none;
   border-radius: 9999px;
   background: transparent;
-  color: rgba(245, 240, 232, 0.5);
+  color: var(--Muted-Color);
   font-size: 0.8rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -49,13 +49,13 @@ const model = defineModel<TransactionType>({ required: true })
   transition: all 0.25s;
 
   &--active.toggle__btn--income {
-    background: rgba(107, 157, 122, 0.25);
-    color: #8ec49a;
+    background: var(--Success-Badge-Bg);
+    color: var(--Success-Text);
   }
 
   &--active.toggle__btn--expense {
-    background: rgba(196, 92, 92, 0.25);
-    color: #e08a8a;
+    background: var(--Danger-Badge-Bg);
+    color: var(--Danger-Text);
   }
 }
 </style>

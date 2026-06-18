@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import { ChartPie, ClipboardList } from '@lucide/vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
 
 const tabs = [
-  { name: 'dashboard', label: 'สรุป', icon: '◈' },
-  { name: 'records', label: 'บันทึก', icon: '☰' },
+  { name: 'dashboard', label: 'สรุป', icon: ChartPie },
+  { name: 'records', label: 'บันทึก', icon: ClipboardList },
 ] as const
 
 function go(name: string) {
@@ -24,7 +25,7 @@ function go(name: string) {
       :class="{ 'bottom-nav__item--active': route.name === tab.name }"
       @click="go(tab.name)"
     >
-      <span class="bottom-nav__icon">{{ tab.icon }}</span>
+      <component :is="tab.icon" class="bottom-nav__icon" :size="20" :stroke-width="1.75" />
       <span class="bottom-nav__label">{{ tab.label }}</span>
     </button>
   </nav>
@@ -52,7 +53,7 @@ function go(name: string) {
   padding: 0.4rem;
   border: none;
   background: transparent;
-  color: rgba(245, 240, 232, 0.45);
+  color: var(--Muted-Color);
   cursor: pointer;
   transition: color 0.2s;
 
@@ -62,7 +63,7 @@ function go(name: string) {
 }
 
 .bottom-nav__icon {
-  font-size: 1.1rem;
+  display: block;
 }
 
 .bottom-nav__label {

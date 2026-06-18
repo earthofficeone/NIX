@@ -7,6 +7,15 @@ export interface User {
   createdAt: string
 }
 
+export interface RecordTitle {
+  id: string
+  userId: string
+  type: TransactionType
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Transaction {
   id: string
   userId: string

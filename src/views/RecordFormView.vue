@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { ChevronLeft } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CalculatorSheet from '@/components/calculator/CalculatorSheet.vue'
+import TitleSelect from '@/components/transaction/TitleSelect.vue'
 import TypeToggle from '@/components/transaction/TypeToggle.vue'
 import ImageUpload from '@/components/transaction/ImageUpload.vue'
 import { useCalculator, type CalcOperator } from '@/composables/useCalculator'
@@ -166,7 +168,8 @@ function onSlipParsed(result: SlipQrParseResult) {
         class="form-page__back flex items-center gap-1 hover:scale-105"
         @click="cancel"
       >
-        <span class="text-lg">‹</span> กลับ
+        <ChevronLeft :size="18" :stroke-width="1.75" aria-hidden="true" />
+        กลับ
       </button>
       <h1 class="lux-title">{{ isEdit ? 'แก้ไขรายการ' : 'บันทึกใหม่' }}</h1>
     </header>
@@ -211,13 +214,7 @@ function onSlipParsed(result: SlipQrParseResult) {
       <div class="fields">
         <div class="field">
           <label class="lux-label" for="title">หัวข้อ</label>
-          <input
-            id="title"
-            v-model="title"
-            type="text"
-            class="lux-input"
-            placeholder="เช่น อาหาร, เงินเดือน"
-          />
+          <TitleSelect v-model="title" :transaction-type="type" input-id="title" />
         </div>
         <div class="field">
           <label class="lux-label" for="note">รายละเอียด</label>
@@ -315,14 +312,14 @@ function onSlipParsed(result: SlipQrParseResult) {
 }
 
 input[type='date'] {
-  color-scheme: dark;
+  color-scheme: inherit;
 }
 
 .amount-keyboard-hint {
   margin: 0 0 0.5rem;
   font-size: 0.65rem;
   letter-spacing: 0.04em;
-  color: rgba(245, 240, 232, 0.35);
+  color: var(--Faint-Color);
 }
 
 .lux-amount-input--expr {
@@ -340,7 +337,7 @@ input[type='date'] {
 
 .form-hint {
   text-align: center;
-  color: rgba(245, 240, 232, 0.45);
+  color: var(--Hint-Color);
   font-size: 0.85rem;
   margin: 0;
 }

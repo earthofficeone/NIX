@@ -84,7 +84,7 @@ function openImage(e: Event) {
   border: 1px solid rgba(201, 169, 110, 0.2);
   border-radius: 0.5rem;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--Surface-Background);
   cursor: zoom-in;
 
   img {
@@ -118,24 +118,24 @@ function openImage(e: Event) {
   letter-spacing: 0.02em;
 
   &--income {
-    color: #8ec49a;
+    color: var(--Success-Text);
   }
 
   &--expense {
-    color: #e08a8a;
+    color: var(--Danger-Text);
   }
 }
 
 .tx-card__title {
   font-size: 1rem;
   font-weight: 400;
-  color: #f5f0e8;
+  color: var(--Text-Color);
   margin: 0 0 0.2rem;
 }
 
 .tx-card__note {
   font-size: 0.8rem;
-  color: rgba(245, 240, 232, 0.5);
+  color: var(--Muted-Color);
   margin: 0 0 0.35rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -144,7 +144,7 @@ function openImage(e: Event) {
 
 .tx-card__date {
   font-size: 0.7rem;
-  color: rgba(245, 240, 232, 0.4);
+  color: var(--Subtle-Color);
   letter-spacing: 0.06em;
 }
 </style>

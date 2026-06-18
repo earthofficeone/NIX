@@ -1,13 +1,86 @@
-:root {
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+
   --Background-Color: #121212;
-  --Primary-Color: #C9A96E;
+  --Background-Accent: #0e0e0e;
+  --Primary-Color: #c9a96e;
+  --Primary-Deep: #a8894a;
   --Danger-Color: #c45c5c;
   --Success-Color: #6b9d7a;
+  --Success-Text: #8ec49a;
+  --Danger-Text: #e08a8a;
   --Text-Color: #f5f0e8;
+  --Label-Color: rgba(245, 240, 232, 0.72);
   --Border-Color: rgba(201, 169, 110, 0.15);
-
-  // rgba colors
   --Card-Border: rgba(201, 169, 110, 0.22);
-  --Muted-Color: rgba(245, 240, 232, 0.55);
+  --Muted-Color: rgba(245, 240, 232, 0.62);
   --Card-Background: rgba(255, 255, 255, 0.04);
+  --Input-Background: rgba(0, 0, 0, 0.35);
+  --Surface-Background: rgba(0, 0, 0, 0.3);
+  --Surface-Overlay: rgba(0, 0, 0, 0.55);
+  --Card-Shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  --Card-Highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --Placeholder-Color: rgba(245, 240, 232, 0.35);
+  --Hint-Color: rgba(245, 240, 232, 0.55);
+  --Subtle-Color: rgba(245, 240, 232, 0.48);
+  --Faint-Color: rgba(245, 240, 232, 0.4);
+  --Ghost-Hover: rgba(201, 169, 110, 0.08);
+  --Focus-Ring: rgba(201, 169, 110, 0.12);
+  --Gradient-Glow: rgba(201, 169, 110, 0.12);
+  --Gold-Gradient: linear-gradient(135deg, #d4b87a 0%, #a8894a 100%);
+  --Gold-Gradient-Soft: linear-gradient(90deg, #a8894a, #d4b87a);
+  --Success-Badge-Bg: rgba(107, 157, 122, 0.2);
+  --Danger-Badge-Bg: rgba(196, 92, 92, 0.2);
+  --Sheet-Background: linear-gradient(180deg, #1a1a1a 0%, #121212 100%);
+  --Sheet-Shadow: 0 -12px 40px rgba(0, 0, 0, 0.5);
+  --Meta-Theme-Color: #121212;
+  --Bar-Track: rgba(255, 255, 255, 0.06);
+  --Item-Hover: rgba(201, 169, 110, 0.1);
+  --Item-Selected: rgba(201, 169, 110, 0.16);
+  --Item-Active: rgba(201, 169, 110, 0.22);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --Background-Color: #f3ece2;
+  --Background-Accent: #e8dfd1;
+  --Primary-Color: #7a5c1e;
+  --Primary-Deep: #5c4512;
+  --Danger-Color: #a83838;
+  --Success-Color: #2d6b44;
+  --Success-Text: #256038;
+  --Danger-Text: #9e2f2f;
+  --Text-Color: #1c1610;
+  --Label-Color: #5c4a32;
+  --Border-Color: rgba(122, 92, 30, 0.22);
+  --Card-Border: rgba(122, 92, 30, 0.3);
+  --Muted-Color: #6b5840;
+  --Card-Background: #fffcf7;
+  --Input-Background: #ffffff;
+  --Surface-Background: rgba(255, 252, 247, 0.92);
+  --Surface-Overlay: rgba(28, 22, 16, 0.18);
+  --Card-Shadow:
+    0 1px 2px rgba(62, 48, 29, 0.04),
+    0 6px 24px rgba(62, 48, 29, 0.07);
+  --Card-Highlight: inset 0 1px 0 rgba(255, 255, 255, 1);
+  --Placeholder-Color: #9a8770;
+  --Hint-Color: #736245;
+  --Subtle-Color: #85755c;
+  --Faint-Color: #968770;
+  --Ghost-Hover: rgba(122, 92, 30, 0.08);
+  --Focus-Ring: rgba(122, 92, 30, 0.18);
+  --Gradient-Glow: rgba(168, 137, 74, 0.14);
+  --Gold-Gradient: linear-gradient(135deg, #c9a96e 0%, #8b6914 100%);
+  --Gold-Gradient-Soft: linear-gradient(90deg, #8b6914, #c9a96e);
+  --Success-Badge-Bg: rgba(45, 107, 68, 0.12);
+  --Danger-Badge-Bg: rgba(168, 56, 56, 0.1);
+  --Sheet-Background: linear-gradient(180deg, #fffcf7 0%, #f3ece2 100%);
+  --Sheet-Shadow: 0 -12px 40px rgba(62, 48, 29, 0.1);
+  --Meta-Theme-Color: #f3ece2;
+  --Bar-Track: rgba(122, 92, 30, 0.12);
+  --Item-Hover: rgba(122, 92, 30, 0.08);
+  --Item-Selected: rgba(201, 169, 110, 0.22);
+  --Item-Active: rgba(201, 169, 110, 0.32);
 }

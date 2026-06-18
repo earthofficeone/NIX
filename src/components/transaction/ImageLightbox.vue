@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { X } from '@lucide/vue'
 import { onUnmounted, watch } from 'vue'
 
 const open = defineModel<boolean>({ default: false })
@@ -36,7 +37,9 @@ onUnmounted(() => {
   <Teleport to="body">
     <Transition name="lightbox">
       <div v-if="open" class="lightbox" role="dialog" aria-modal="true" @click="close">
-        <button type="button" class="lightbox__close" aria-label="ปิด" @click.stop="close">×</button>
+        <button type="button" class="lightbox__close" aria-label="ปิด" @click.stop="close">
+          <X :size="22" :stroke-width="1.75" aria-hidden="true" />
+        </button>
         <img class="lightbox__img" :src="src" :alt="alt ?? 'รูปแนบ'" @click.stop />
       </div>
     </Transition>
@@ -76,10 +79,11 @@ onUnmounted(() => {
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.6);
   color: #fff;
-  font-size: 1.5rem;
-  line-height: 1;
   cursor: pointer;
   z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     border-color: var(--Primary-Color);

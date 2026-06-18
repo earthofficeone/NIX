@@ -39,6 +39,21 @@ export const useTransactionStore = defineStore('transactions', () => {
     return [...map.entries()].sort((a, b) => b[0].localeCompare(a[0]))
   }
 
+  function recordCountByDate(month: string) {
+    const map = new Map<string, number>()
+    for (const t of userTransactions.value) {
+      if (!t.date.startsWith(month)) continue
+      map.set(t.date, (map.get(t.date) ?? 0) + 1)
+    }
+    return map
+  }
+
+  function transactionsForDate(date: string) {
+    return userTransactions.value
+      .filter((t) => t.date === date)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  }
+
   function categoryBreakdown(month: string) {
     const expenses = userTransactions.value.filter(
       (t) => t.date.startsWith(month) && t.type === 'expense',
@@ -61,7 +76,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     loading.value = true
     error.value = null
     try {
-      items.value = await api.listTransactions(month)
+      items.value = await api.transactions.list(month)
       loadedMonth.value = month ?? null
     } catch (e) {
       error.value = e instanceof ApiError ? e.message : 'โหลดรายการไม่สำเร็จ'
@@ -75,7 +90,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     const cached = getById(id)
     if (cached) return cached
     try {
-      const tx = await api.getTransaction(id)
+      const tx = await api.transactions.get(id)
       const idx = items.value.findIndex((t) => t.id === id)
       if (idx === -1) items.value.push(tx)
       else items.value[idx] = tx
@@ -94,7 +109,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     date?: string
   }): Promise<Transaction | null> {
     try {
-      const tx = await api.createTransaction({
+      const tx = await api.transactions.create({
         type: payload.type,
         amount: payload.amount,
         title: payload.title,
@@ -117,7 +132,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     const existing = getById(id)
     if (!existing) return false
     try {
-      const tx = await api.updateTransaction(id, {
+      const tx = await api.transactions.update(id, {
         type: payload.type ?? existing.type,
         amount: payload.amount ?? existing.amount,
         title: payload.title ?? existing.title,
@@ -136,7 +151,7 @@ export const useTransactionStore = defineStore('transactions', () => {
 
   async function remove(id: string): Promise<boolean> {
     try {
-      await api.deleteTransaction(id)
+      await api.transactions.delete(id)
       items.value = items.value.filter((t) => t.id !== id)
       return true
     } catch (e) {
@@ -162,6 +177,8 @@ export const useTransactionStore = defineStore('transactions', () => {
     userTransactions,
     summaryForMonth,
     dailyGroups,
+    recordCountByDate,
+    transactionsForDate,
     categoryBreakdown,
     getById,
     fetchList,
