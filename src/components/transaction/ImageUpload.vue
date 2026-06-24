@@ -104,6 +104,7 @@ function openLightbox() {
       ref="fileInput"
       type="file"
       accept="image/*"
+      capture="environment"
       class="hidden"
       @change="onFileChange"
     />
