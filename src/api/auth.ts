@@ -28,14 +28,6 @@ export const authApi = {
     return request<import('@/types').User>('/auth/me')
   },
 
-  forgotPassword(body: { email: string }) {
-    return request<MessageResponse>('/auth/forgot-password', {
-      method: 'POST',
-      body: JSON.stringify(body),
-      timeoutMs: 45_000,
-    })
-  },
-
   resetPassword(body: { email: string; code: string; password: string }) {
     return request<MessageResponse>('/auth/reset-password', {
       method: 'POST',

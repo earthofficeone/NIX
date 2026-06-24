@@ -14,24 +14,18 @@ const password = ref('')
 const confirm = ref('')
 const error = ref('')
 const loading = ref(false)
-const useRecovery = ref(false)
 
 onMounted(() => {
   const q = route.query.email
   if (typeof q === 'string') {
     email.value = q
   }
-  useRecovery.value = route.query.recovery === '1'
 })
 
 async function submit() {
   error.value = ''
   if (!email.value || !code.value || !password.value) {
     error.value = 'กรุณากรอกข้อมูลให้ครบ'
-    return
-  }
-  if (code.value.length !== 6) {
-    error.value = 'รหัสยืนยันต้องมี 6 หลัก'
     return
   }
   if (password.value.length < 4) {
@@ -63,22 +57,9 @@ async function submit() {
   <AuthLayout>
     <form class="py-8 px-7 lux-card" @submit.prevent="submit">
       <h2 class="text-[1.35rem] font-light text-(--Text-Color) mb-[0.35rem] tracking-[0.06em]">
-        ตั้งรหัสผ่านใหม่
+        เปลี่ยนรหัสผ่าน
       </h2>
-      <p class="lux-subtitle mb-7">
-        {{
-          useRecovery
-            ? 'ใส่รหัสรับและรหัสผ่านใหม่'
-            : 'ใส่รหัสยืนยันจากอีเมลและรหัสผ่านใหม่'
-        }}
-      </p>
-
-      <p
-        v-if="useRecovery"
-        class="text-[0.85rem] text-(--Muted-Color) mb-5 px-3 py-2 rounded border border-(--Border-Color, #333)"
-      >
-        ไม่ได้รับอีเมลหรือส่งไม่สำเร็จ — ใส่รหัสรับในช่องรหัสยืนยัน
-      </p>
+      <p class="lux-subtitle mb-7">กรอกอีเมล รหัสลับ และรหัสผ่านใหม่</p>
 
       <div class="mb-[1.1rem]">
         <label class="lux-label" for="email">อีเมล</label>
@@ -91,17 +72,14 @@ async function submit() {
         />
       </div>
       <div class="mb-[1.1rem]">
-        <label class="lux-label" for="code">{{
-          useRecovery ? 'รหัสรับ' : 'รหัสยืนยัน'
-        }}</label>
+        <label class="lux-label" for="code">รหัสลับ</label>
         <input
           id="code"
           v-model="code"
-          type="text"
-          inputmode="numeric"
-          maxlength="6"
-          class="lux-input tracking-[0.3em] text-center"
-          placeholder="000000"
+          type="password"
+          class="lux-input"
+          placeholder="••••••"
+          autocomplete="off"
         />
       </div>
       <div class="mb-[1.1rem]">
@@ -128,14 +106,11 @@ async function submit() {
       <p v-if="error" class="text-(--Danger-Color) text-[0.85rem] mb-4">{{ error }}</p>
 
       <button type="submit" class="lux-btn lux-btn--gold lux-btn--full" :disabled="loading">
-        {{ loading ? 'กำลังบันทึก...' : 'ตั้งรหัสผ่านใหม่' }}
+        {{ loading ? 'กำลังบันทึก...' : 'เปลี่ยนรหัสผ่าน' }}
       </button>
 
       <p class="text-center mt-6 text-[0.85rem] text-(--Muted-Color)">
-        <RouterLink to="/forgot-password" class="text-(--Primary-Color) mr-3"
-          >ขอรหัสใหม่</RouterLink
-        >
-        <RouterLink to="/login" class="text-(--Primary-Color)">เข้าสู่ระบบ</RouterLink>
+        <RouterLink to="/login" class="text-(--Primary-Color)">กลับไปเข้าสู่ระบบ</RouterLink>
       </p>
     </form>
   </AuthLayout>

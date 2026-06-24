@@ -85,8 +85,8 @@ async function submit() {
       </div>
 
       <p class="text-right mt-[-6px] mb-4">
-        <RouterLink to="/forgot-password" class="text-[0.8rem] text-(--Primary-Color)">
-          ลืมรหัสผ่าน?
+        <RouterLink to="/reset-password" class="text-[0.8rem] text-(--Primary-Color)">
+          เปลี่ยนรหัสผ่าน
         </RouterLink>
       </p>
 
