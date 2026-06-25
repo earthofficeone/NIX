@@ -1,0 +1,2 @@
+## Copy to local.properties (gitignored) — แก้ path ให้ตรงเครื่องคุณ
+sdk.dir=/Users/<username>/Library/Android/sdk

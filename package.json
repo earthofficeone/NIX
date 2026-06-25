@@ -12,8 +12,10 @@
     "format": "prettier --write --experimental-cli src/",
     "cap:sync": "pnpm build && npx cap sync android",
     "cap:open": "npx cap open android",
-    "cap:build:debug": "cd android && JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\" ./gradlew assembleDebug",
-    "cap:build:release": "cd android && JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\" ./gradlew assembleRelease"
+    "cap:build:debug": "node scripts/ensure-android-local.mjs && cd android && JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\" ./gradlew assembleDebug",
+    "cap:build:release": "node scripts/ensure-android-local.mjs && cd android && JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\" ./gradlew assembleRelease",
+    "cap:upload": "node scripts/run-with-env.mjs scripts/upload-apk.mjs",
+    "cap:build:upload": "pnpm cap:sync && pnpm cap:build:debug && pnpm cap:upload"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.1",
