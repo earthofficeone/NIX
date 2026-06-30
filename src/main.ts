@@ -8,6 +8,7 @@ import App from './App.vue'
 import router from './router'
 import { useAuthStore } from '@/stores/auth'
 import { useTheme } from '@/composables/useTheme'
+import { initNativeShell } from '@/composables/useNativeShell'
 import { startBackendKeepAlive } from '@/utils/backendKeepAlive'
 
 const app = createApp(App)
@@ -16,6 +17,7 @@ app.use(pinia)
 app.use(router)
 
 useTheme().init()
+void initNativeShell()
 startBackendKeepAlive()
 
 // Mount immediately — auth.init() runs in App.vue so a slow API never leaves a blank screen.
