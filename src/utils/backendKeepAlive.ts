@@ -4,9 +4,9 @@ const PING_TIMEOUT_MS = 30_000
 function resolveHealthUrl(): string {
   const apiBase = import.meta.env.VITE_API_URL as string | undefined
   if (apiBase) {
-    return `${apiBase.replace(/\/api\/?$/, '')}/health`
+    return `${apiBase.replace(/\/$/, '')}/health`
   }
-  return '/health'
+  return '/api/health'
 }
 
 async function pingBackend(): Promise<void> {
