@@ -1,18 +1,10 @@
+import { api } from '@/api/client'
+
 const INTERVAL_MS = 10 * 60 * 1000
 const PING_TIMEOUT_MS = 30_000
 const LOG_PREFIX = '[nix-keep-alive]'
-const KEEP_ALIVE_HEADER = 'X-Keep-Alive-Source'
-const KEEP_ALIVE_SOURCE = 'nix-frontend'
 
 export type KeepAliveReason = 'bootstrap' | 'interval' | 'visibility'
-
-function resolveHealthUrl(): string {
-  const apiBase = import.meta.env.VITE_API_URL as string | undefined
-  if (apiBase) {
-    return `${apiBase.replace(/\/$/, '')}/health`
-  }
-  return '/api/health'
-}
 
 function log(message: string, details?: Record<string, unknown>) {
   if (details) {
@@ -23,35 +15,18 @@ function log(message: string, details?: Record<string, unknown>) {
 }
 
 async function pingBackend(reason: KeepAliveReason): Promise<void> {
-  const url = resolveHealthUrl()
   const startedAt = performance.now()
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), PING_TIMEOUT_MS)
 
-  log('ping start', { reason, url })
+  log('ping start', { reason })
 
   try {
-    const res = await fetch(url, {
-      method: 'GET',
-      signal: controller.signal,
-      cache: 'no-store',
-      headers: {
-        [KEEP_ALIVE_HEADER]: KEEP_ALIVE_SOURCE,
-      },
-    })
-
+    await api.health.check({ timeoutMs: PING_TIMEOUT_MS })
     const durationMs = Math.round(performance.now() - startedAt)
-
-    if (res.ok) {
-      log('ping ok', { reason, status: res.status, durationMs })
-      return
-    }
-
-    log('ping failed', { reason, status: res.status, durationMs })
+    log('ping ok', { reason, durationMs })
   } catch (error) {
     const durationMs = Math.round(performance.now() - startedAt)
     const message = error instanceof Error ? error.message : 'unknown error'
-    const timedOut = error instanceof DOMException && error.name === 'AbortError'
+    const timedOut = error instanceof Error && message.includes('ไม่ตอบสนอง')
 
     log('ping error', {
       reason,
@@ -59,17 +34,13 @@ async function pingBackend(reason: KeepAliveReason): Promise<void> {
       timedOut,
       message,
     })
-  } finally {
-    clearTimeout(timeoutId)
   }
 }
 
 export function startBackendKeepAlive(): () => void {
-  const healthUrl = resolveHealthUrl()
   const intervalMinutes = INTERVAL_MS / 60_000
 
   log('started', {
-    healthUrl,
     intervalMinutes,
     triggers: ['bootstrap', `every ${intervalMinutes} min`, 'tab/app visible'],
   })
