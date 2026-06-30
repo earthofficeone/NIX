@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Paperclip } from '@lucide/vue'
-import { computed, ref, watch } from 'vue'
+import { Capacitor } from '@capacitor/core'
+import { Camera, Image, Paperclip } from '@lucide/vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import ImageLightbox from '@/components/transaction/ImageLightbox.vue'
 import { parseSlipFromDataUrl, type SlipQrParseResult } from '@/composables/useSlipQr'
 
@@ -14,8 +15,10 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const lightboxOpen = ref(false)
 const parsing = ref(false)
 const parseMessage = ref<string | null>(null)
+const captureMode = ref<'environment' | undefined>(undefined)
 
 const hasImage = computed(() => !!model.value)
+const isNativeApp = Capacitor.isNativePlatform()
 
 const parseMessageClass = computed(() => {
   if (!parseMessage.value) return ''
@@ -62,8 +65,9 @@ async function readQrFromDataUrl(dataUrl: string) {
   }
 }
 
-function pickImage() {
-  fileInput.value?.click()
+function pickImage(mode?: 'camera' | 'gallery') {
+  captureMode.value = mode === 'camera' ? 'environment' : undefined
+  void nextTick(() => fileInput.value?.click())
 }
 
 function onFileChange(e: Event) {
@@ -104,6 +108,7 @@ function openLightbox() {
       ref="fileInput"
       type="file"
       accept="image/*"
+      :capture="captureMode"
       class="hidden"
       @change="onFileChange"
     />
@@ -125,12 +130,23 @@ function openLightbox() {
         <span class="upload__zoom">แตะเพื่อขยาย</span>
       </button>
       <div class="upload__actions">
-        <button type="button" class="upload__btn" @click="pickImage">เปลี่ยนรูป</button>
+        <button type="button" class="upload__btn" @click="pickImage('gallery')">เปลี่ยนรูป</button>
         <button type="button" class="upload__btn upload__btn--danger" @click="remove">ลบรูป</button>
       </div>
     </div>
 
-    <button v-else type="button" class="upload__trigger" @click="pickImage">
+    <div v-else-if="isNativeApp" class="upload__native-actions">
+      <button type="button" class="upload__trigger upload__trigger--half" @click="pickImage('gallery')">
+        <Image class="upload__icon" :size="18" :stroke-width="1.75" aria-hidden="true" />
+        <span>เลือกจากอัลบั้ม</span>
+      </button>
+      <button type="button" class="upload__trigger upload__trigger--half" @click="pickImage('camera')">
+        <Camera class="upload__icon" :size="18" :stroke-width="1.75" aria-hidden="true" />
+        <span>ถ่ายรูป</span>
+      </button>
+    </div>
+
+    <button v-else type="button" class="upload__trigger" @click="pickImage('gallery')">
       <Paperclip class="upload__icon" :size="18" :stroke-width="1.75" aria-hidden="true" />
       <span>แนบรูปสลิป / ใบเสร็จ</span>
     </button>
@@ -189,6 +205,18 @@ function openLightbox() {
     border-color: var(--Primary-Color);
     color: var(--Primary-Color);
   }
+
+  &--half {
+    flex: 1;
+    min-width: 0;
+    padding: 0.85rem 0.5rem;
+    font-size: 0.78rem;
+  }
+}
+
+.upload__native-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .upload__icon {
