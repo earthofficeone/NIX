@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Capacitor } from '@capacitor/core'
 import { Camera, Image, Paperclip } from '@lucide/vue'
 import { computed, nextTick, ref, watch } from 'vue'
 import ImageLightbox from '@/components/transaction/ImageLightbox.vue'
 import { parseSlipFromDataUrl, type SlipQrParseResult } from '@/composables/useSlipQr'
+import { isNativeApp } from '@/utils/isNativeApp'
 
 const model = defineModel<string | undefined>()
 
@@ -18,7 +18,7 @@ const parseMessage = ref<string | null>(null)
 const captureMode = ref<'environment' | undefined>(undefined)
 
 const hasImage = computed(() => !!model.value)
-const isNativeApp = Capacitor.isNativePlatform()
+const isNativeAppUi = isNativeApp()
 
 const parseMessageClass = computed(() => {
   if (!parseMessage.value) return ''
@@ -135,7 +135,7 @@ function openLightbox() {
       </div>
     </div>
 
-    <div v-else-if="isNativeApp" class="upload__native-actions">
+    <div v-else-if="isNativeAppUi" class="upload__native-actions">
       <button type="button" class="upload__trigger upload__trigger--half" @click="pickImage('gallery')">
         <Image class="upload__icon" :size="18" :stroke-width="1.75" aria-hidden="true" />
         <span>เลือกจากอัลบั้ม</span>
