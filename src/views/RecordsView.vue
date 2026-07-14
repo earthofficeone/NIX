@@ -11,7 +11,7 @@ import { isDateInMonth } from '@/utils/calendar'
 const txStore = useTransactionStore()
 const selectedMonth = ref(monthKey())
 const selectedDay = ref<string | null>(null)
-const viewMode = ref<'day' | 'month'>('day')
+const viewMode = ref<'day' | 'month'>('month')
 
 const recordCounts = computed(() => txStore.recordCountByDate(selectedMonth.value))
 
@@ -113,22 +113,22 @@ watch(selectedMonth, (month) => {
       <button
         type="button"
         class="view-toggle__btn"
-        :class="{ 'view-toggle__btn--active': viewMode === 'day' }"
-        role="tab"
-        :aria-selected="viewMode === 'day'"
-        @click="showDayView"
-      >
-        รายวัน
-      </button>
-      <button
-        type="button"
-        class="view-toggle__btn"
         :class="{ 'view-toggle__btn--active': viewMode === 'month' }"
         role="tab"
         :aria-selected="viewMode === 'month'"
         @click="showMonthView"
       >
         ทั้งเดือน
+      </button>
+      <button
+        type="button"
+        class="view-toggle__btn"
+        :class="{ 'view-toggle__btn--active': viewMode === 'day' }"
+        role="tab"
+        :aria-selected="viewMode === 'day'"
+        @click="showDayView"
+      >
+        รายวัน
       </button>
     </div>
 
