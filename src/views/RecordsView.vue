@@ -1,30 +1,24 @@
 <script setup lang="ts">
-import { ChevronLeft, ChevronRight } from '@lucide/vue'
+import { CalendarDays } from '@lucide/vue'
 import { computed, onMounted, ref, watch } from 'vue'
-import MonthCalendar from '@/components/calendar/MonthCalendar.vue'
+import DateFilterPopup from '@/components/calendar/DateFilterPopup.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import TransactionCard from '@/components/transaction/TransactionCard.vue'
 import { useTransactionStore } from '@/stores/transactions'
-import { formatDate, monthKey, todayISO } from '@/utils/format'
-import { isDateInMonth } from '@/utils/calendar'
+import { formatDate, monthKey } from '@/utils/format'
 
 const txStore = useTransactionStore()
+const popupOpen = ref(false)
 const selectedMonth = ref(monthKey())
 const selectedDay = ref<string | null>(null)
 const viewMode = ref<'day' | 'month'>('month')
 
 const recordCounts = computed(() => txStore.recordCountByDate(selectedMonth.value))
-
 const monthGroups = computed(() => txStore.dailyGroups(selectedMonth.value))
 
 const dayTransactions = computed(() => {
   if (!selectedDay.value) return []
   return txStore.transactionsForDate(selectedDay.value)
-})
-
-const selectedDayLabel = computed(() => {
-  if (!selectedDay.value) return ''
-  return formatDate(selectedDay.value)
 })
 
 const monthLabel = computed(() => {
@@ -34,56 +28,30 @@ const monthLabel = computed(() => {
   )
 })
 
-const listTitle = computed(() => {
-  if (viewMode.value === 'month') return `ทั้งเดือน · ${monthLabel.value}`
-  return selectedDayLabel.value
+const filterLabel = computed(() => {
+  if (viewMode.value === 'day' && selectedDay.value) return formatDate(selectedDay.value)
+  return `ทั้งเดือน · ${monthLabel.value}`
 })
 
-function defaultDayForMonth(month: string): string | null {
-  const today = todayISO()
-  if (isDateInMonth(today, month)) return today
-  return null
-}
-
-function syncSelectedDay(month: string) {
-  if (viewMode.value === 'month') {
-    selectedDay.value = null
-    return
-  }
-  if (selectedDay.value && isDateInMonth(selectedDay.value, month)) return
-  selectedDay.value = defaultDayForMonth(month)
-}
-
-function shiftMonth(delta: number) {
-  const [y, m] = selectedMonth.value.split('-').map(Number)
-  const d = new Date(y!, m! - 1 + delta, 1)
-  selectedMonth.value = monthKey(d)
-}
+const listTitle = computed(() => filterLabel.value)
 
 function selectDay(date: string) {
+  const month = date.slice(0, 7)
+  if (month !== selectedMonth.value) {
+    selectedMonth.value = month
+  }
   viewMode.value = 'day'
   selectedDay.value = date
 }
 
-function showMonthView() {
+function clearFilter() {
   viewMode.value = 'month'
   selectedDay.value = null
 }
 
-function showDayView() {
-  viewMode.value = 'day'
-  if (!selectedDay.value) {
-    selectedDay.value = defaultDayForMonth(selectedMonth.value)
-  }
-}
-
-onMounted(() => {
-  syncSelectedDay(selectedMonth.value)
-  txStore.fetchList(selectedMonth.value)
-})
+onMounted(() => txStore.fetchList(selectedMonth.value))
 
 watch(selectedMonth, (month) => {
-  syncSelectedDay(month)
   txStore.fetchList(month)
 })
 </script>
@@ -92,45 +60,26 @@ watch(selectedMonth, (month) => {
   <MainLayout title="บันทึกประจำวัน" subtitle="รายรับ · รายจ่าย">
     <p v-if="txStore.loading" class="loading-hint">กำลังโหลด...</p>
 
-    <div class="month-picker lux-card">
-      <button type="button" class="month-picker__arrow" aria-label="เดือนก่อนหน้า" @click="shiftMonth(-1)">
-        <ChevronLeft :size="20" :stroke-width="1.75" aria-hidden="true" />
-      </button>
-      <span class="month-picker__label">{{ monthLabel }}</span>
-      <button type="button" class="month-picker__arrow" aria-label="เดือนถัดไป" @click="shiftMonth(1)">
-        <ChevronRight :size="20" :stroke-width="1.75" aria-hidden="true" />
+    <div  class="records-filter-bar">
+      <button type="button" class="records-filter-btn lux-card" @click="popupOpen = true">
+        <CalendarDays :size="18" :stroke-width="1.75" aria-hidden="true" />
+        <span class="records-filter-btn__text">
+          <span class="records-filter-btn__label">วันที่บันทึก</span>
+          <span class="records-filter-btn__value">{{ filterLabel }}</span>
+        </span>
       </button>
     </div>
 
-    <MonthCalendar
-      :month="selectedMonth"
+    <DateFilterPopup
+      v-model:open="popupOpen"
+      v-model:month="selectedMonth"
       :selected-date="viewMode === 'day' ? selectedDay : null"
       :record-counts="recordCounts"
+      title="เลือกวันที่บันทึก"
+      clear-label="ทั้งเดือน"
       @select="selectDay"
+      @clear="clearFilter"
     />
-
-    <div class="view-toggle" role="tablist" aria-label="มุมมองรายการ">
-      <button
-        type="button"
-        class="view-toggle__btn"
-        :class="{ 'view-toggle__btn--active': viewMode === 'month' }"
-        role="tab"
-        :aria-selected="viewMode === 'month'"
-        @click="showMonthView"
-      >
-        ทั้งเดือน
-      </button>
-      <button
-        type="button"
-        class="view-toggle__btn"
-        :class="{ 'view-toggle__btn--active': viewMode === 'day' }"
-        role="tab"
-        :aria-selected="viewMode === 'day'"
-        @click="showDayView"
-      >
-        รายวัน
-      </button>
-    </div>
 
     <section v-if="viewMode === 'month'" class="day-records">
       <h2 class="day-records__title">{{ listTitle }}</h2>
@@ -154,38 +103,43 @@ watch(selectedMonth, (month) => {
       </div>
       <p v-else class="empty lux-card">ไม่มีบันทึกในวันนี้ — กด + เพื่อเพิ่มรายการ</p>
     </section>
-
-    <p v-else class="empty lux-card">เลือกวันจากปฏิทินเพื่อดูรายการ</p>
   </MainLayout>
 </template>
 
 <style scoped lang="scss">
-.month-picker {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.85rem 1rem;
+.records-filter-bar {
   margin-bottom: 1.25rem;
 }
 
-.month-picker__arrow {
-  width: 2.25rem;
-  height: 2.25rem;
-  border: 1px solid var(--Border-Color);
-  border-radius: 50%;
-  background: transparent;
+.records-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: none;
   color: var(--Primary-Color);
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
+  text-align: left;
 
-.month-picker__label {
-  font-size: 1rem;
-  letter-spacing: 0.06em;
-  color: var(--Text-Color);
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  &__label {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--Label-Color);
+  }
+
+  &__value {
+    font-size: 0.95rem;
+    color: var(--Text-Color);
+  }
 }
 
 .day-records {
@@ -202,37 +156,6 @@ watch(selectedMonth, (month) => {
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
-  }
-}
-
-.view-toggle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.35rem;
-  padding: 0.25rem;
-  margin-bottom: 1.25rem;
-  border-radius: 9999px;
-  border: 1px solid var(--Card-Border);
-  background: var(--Input-Background);
-}
-
-.view-toggle__btn {
-  padding: 0.55rem 0.75rem;
-  border: none;
-  border-radius: 9999px;
-  background: transparent;
-  color: var(--Muted-Color);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-
-  &--active {
-    background: var(--Item-Selected);
-    color: var(--Primary-Color);
   }
 }
 
