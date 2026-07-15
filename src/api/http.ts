@@ -59,7 +59,17 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     clearTimeout(timeoutId)
   }
 
-  const body = (await res.json()) as ApiEnvelope<T>
+  let body: ApiEnvelope<T>
+  try {
+    const text = await res.text()
+    body = text ? (JSON.parse(text) as ApiEnvelope<T>) : {}
+  } catch {
+    throw new ApiError(
+      res.ok ? 'ตอบกลับจากเซิร์ฟเวอร์ไม่ถูกต้อง' : 'ไม่สามารถเข้าสู่ระบบได้ — ตรวจสอบการเชื่อมต่อ',
+      res.status || 0,
+    )
+  }
+
   if (!res.ok) {
     throw new ApiError(body.error || 'เกิดข้อผิดพลาด', res.status)
   }
