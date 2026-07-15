@@ -29,7 +29,7 @@ async function handleFab() {
 
 <template>
   <div class="min-h-screen pb-22">
-    <div class="max-w-[480px] m-auto pt-6 px-5 pb-8">
+    <div class="max-w-[480px] m-auto pt-12 px-5 pb-8">
       <AppHeader :title="title" :subtitle="subtitle" show-logout />
       <slot />
     </div>
