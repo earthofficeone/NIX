@@ -2,6 +2,7 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { api, ApiError, getToken, setToken } from '@/api/client'
 import { useTransactionStore } from '@/stores/transactions'
+import { useNoteStore } from '@/stores/notes'
 import type { User } from '@/types'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -72,6 +73,7 @@ export const useAuthStore = defineStore('auth', () => {
     setToken(null)
     currentUser.value = null
     useTransactionStore().clear()
+    useNoteStore().clear()
   }
 
   return {

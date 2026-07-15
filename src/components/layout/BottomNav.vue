@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChartPie, ClipboardList } from '@lucide/vue'
+import { ChartPie, ClipboardList, NotebookPen } from '@lucide/vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
@@ -8,6 +8,7 @@ const router = useRouter()
 const tabs = [
   { name: 'dashboard', label: 'สรุป', icon: ChartPie },
   { name: 'records', label: 'บันทึก', icon: ClipboardList },
+  { name: 'notes', label: 'โน๊ต', icon: NotebookPen },
 ] as const
 
 function go(name: string) {

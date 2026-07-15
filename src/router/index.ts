@@ -1,7 +1,7 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 const router = createRouter({
-  history: createWebHashHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
@@ -39,6 +39,19 @@ const router = createRouter({
       path: '/records',
       name: 'records',
       component: () => import('@/views/RecordsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/notes',
+      name: 'notes',
+      component: () => import('@/views/NotesView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/notes/:id',
+      name: 'note-editor',
+      component: () => import('@/views/NoteEditorView.vue'),
+      props: true,
       meta: { requiresAuth: true },
     },
     {
